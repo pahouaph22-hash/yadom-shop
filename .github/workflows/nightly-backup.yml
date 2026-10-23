@@ -1,0 +1,31 @@
+name: nightly-backup
+# Full pg_dump of the Supabase database every night (kept 30 days as a workflow artifact).
+# Setup: repo Settings → Secrets → Actions → add SUPABASE_DB_URL
+#   (Supabase → Project Settings → Database → Connection string → URI, "Session pooler", with your DB password)
+on:
+  schedule:
+    - cron: '0 19 * * *'   # 02:00 Vientiane time
+  workflow_dispatch:
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo apt-get install -y wget ca-certificates
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc >/dev/null
+          sudo apt-get update && sudo apt-get install -y postgresql-client-17
+      - name: Dump
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          test -n "$DB_URL" || { echo "SUPABASE_DB_URL secret is not set"; exit 1; }
+          STAMP=$(date -u +%Y%m%d-%H%M)
+          /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --schema=public --no-owner --no-privileges -Fc -f yadom-$STAMP.dump
+          /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --schema=auth --data-only --table=auth.users -Fc -f yadom-auth-users-$STAMP.dump
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yadom-db-backup
+          path: '*.dump'
+          retention-days: 30
