@@ -330,4 +330,4 @@ insert into public.settings (key, value, is_public) values
   ('payment_info',  '{"lo":"","th":"","en":""}', true)
 on conflict (key) do nothing;
 
-insert into public.admin_allowlist (email) values ('pahouaph22@gmail.com') on conflict do nothing;
+insert into public.admin_allowlist (email) values ('pahouaph22@gmail.com'), ('larmouamua@gmail.com') on conflict do nothing;

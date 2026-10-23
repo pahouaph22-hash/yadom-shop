@@ -8,7 +8,7 @@ Next.js 14 + Supabase (โปรเจกต์ `yadom-shop`, ref `kjicxvauflyjf
    - `NEXT_PUBLIC_SUPABASE_URL` = `https://kjicxvauflyjfqhjijsh.supabase.co`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `sb_publishable_fD1kboE_qu0uJQGT1ZrCCQ_ol37RWpt` (คีย์สาธารณะ ปลอดภัยที่จะใส่ฝั่งเว็บ)
 2. **Supabase → Authentication → URL Configuration** ใส่ Site URL เป็นโดเมน Vercel ของคุณ (เพื่อให้ลิงก์ยืนยันอีเมลกลับมาถูกที่)
-3. **สมัครสมาชิกด้วย `pahouaph22@gmail.com`** ที่หน้า `/register` → ยืนยันอีเมล → บัญชีนี้จะเป็น **ผู้ดูแลระบบ** อัตโนมัติ
+3. **สมัครสมาชิกด้วย `larmouamua@gmail.com`** (หรือ `pahouaph22@gmail.com`) ที่หน้า `/register` → ยืนยันอีเมล → บัญชีนี้จะเป็น **ผู้ดูแลระบบ** อัตโนมัติ
 4. เข้า `/admin` → ตั้งค่า → เพิ่มช่องทางติดต่อ (WhatsApp, Facebook, TikTok…) และข้อมูลการชำระเงิน
 5. สินค้าและสต็อก → เพิ่มสินค้าจริง พร้อมรูป ราคาปลีก/ส่ง ต้นทุน และสต็อกเริ่มต้น
 6. ให้พนักงานสมัครที่ `/register` แล้วกำหนดสิทธิ์ “พนักงาน” ในหน้าตั้งค่า
