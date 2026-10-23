@@ -10,6 +10,7 @@ const ACTION_TH = { insert: 'เพิ่ม', update: 'แก้ไข', delete
 export default function Dashboard() {
   const { isAdmin } = useShop();
   const [d, reload, error] = useLoad((sb) => sb.rpc('dashboard_stats'));
+  const [slips] = useLoad((sb) => sb.from('payment_slips').select('id, order_id, created_at, orders(order_no)').eq('status', 'pending').order('created_at'), []);
   if (error) return <Alert error={error} />;
   if (!d) return <p className="text-ink-soft">กำลังโหลด…</p>;
   const today = d.today || {};
@@ -28,6 +29,15 @@ export default function Dashboard() {
         <Stat label="รับเงินจริงวันนี้" value={kip(Number(today.received || 0) - Number(today.refunds || 0))} tone="gold" />
         <Stat label="ยอดค้างชำระทั้งหมด" value={kip(d.unpaid_total)} tone="red" href="/admin/orders?unpaid=1" />
       </div>
+
+      {slips?.length > 0 && (
+        <div className="mt-6 rounded-xl border-2 border-saffron bg-saffron-pale p-4">
+          <p className="font-semibold">มีสลิปการโอนรอตรวจสอบ {slips.length} รายการ</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {slips.map((s) => <Link key={s.id} href={`/admin/orders/view?id=${s.order_id}`} className="btn-ghost btn-sm">{s.orders?.order_no} · {dt(s.created_at)}</Link>)}
+          </div>
+        </div>
+      )}
 
       <h2 className="mb-3 mt-8 font-semibold text-ink-soft">เดือนนี้</h2>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">

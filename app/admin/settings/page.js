@@ -5,6 +5,7 @@ import { useShop } from '@/components/Providers';
 import { PageHead, Alert, Modal, useLoad } from '@/components/admin/ui';
 import { CHANNEL_TYPES, CHANNEL_LABEL, ChannelIcon, channelHref } from '@/components/channels';
 import { errMsg, dt } from '@/lib/format';
+import QrManager from '@/components/admin/QrManager';
 
 const LANG3 = [['lo', 'ລາວ'], ['th', 'ไทย'], ['en', 'English']];
 const ML_KEYS = [
@@ -65,6 +66,7 @@ export default function SettingsPage() {
     <>
       <PageHead title="ช่องทางติดต่อและตั้งค่า" />
       <Alert {...msg} />
+      <QrManager />
 
       <section className="card mb-6 p-4">
         <div className="mb-3 flex items-center justify-between">

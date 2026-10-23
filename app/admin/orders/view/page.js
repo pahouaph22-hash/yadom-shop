@@ -6,6 +6,7 @@ import { getSupabase } from '@/lib/supabase/client';
 import { useShop } from '@/components/Providers';
 import { PageHead, StatusBadge, Alert, Modal, useLoad, STATUS_TH, PM_TH, CHANNEL_TH, CTYPE_TH } from '@/components/admin/ui';
 import { kip, dt, errMsg } from '@/lib/format';
+import SlipReview from '@/components/admin/SlipReview';
 
 const NEXT = {
   received: ['pending_payment', 'shipping', 'delivered', 'cancelled'],
@@ -101,6 +102,8 @@ function OrderDetail({ params }) {
             {!closed && <div className="p-4 pt-2 no-print"><button onClick={() => { setMsg({}); setModal('fees'); }} className="btn-ghost btn-sm">แก้ไขส่วนลด / ค่าจัดส่ง / ที่อยู่ / หมายเหตุ</button></div>}
             {closed && <div className="p-4 pt-2 no-print"><button onClick={() => { setMsg({}); setModal('note'); }} className="btn-ghost btn-sm">แก้ไขหมายเหตุภายใน</button></div>}
           </section>
+
+          <SlipReview orderId={id} outstanding={closed ? 0 : outstanding} onChanged={reload} />
 
           <section className="card p-4">
             <h2 className="mb-3 font-semibold">การชำระเงินและการคืนเงิน</h2>

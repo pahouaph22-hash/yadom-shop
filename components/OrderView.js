@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import { useShop } from './Providers';
 import { getSupabase } from '@/lib/supabase/client';
 import OrderTimeline from './OrderTimeline';
+import PaymentBox from './PaymentBox';
 import { dt } from '@/lib/format';
 
 export default function OrderView({ orderNo, phone, isNew }) {
   const { t, fmt } = useShop();
   const [order, setOrder] = useState(undefined);
-  useEffect(() => {
-    getSupabase().rpc('track_order', { p_order_no: orderNo, p_phone: phone }).then(({ data }) => setOrder(data || null));
-  }, [orderNo, phone]);
+  const load = () => getSupabase().rpc('track_order', { p_order_no: orderNo, p_phone: phone }).then(({ data }) => setOrder(data || null));
+  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [orderNo, phone]);
 
   if (order === undefined) return <p className="py-10 text-center text-ink-soft">…</p>;
   if (order === null) return <p className="rounded-lg bg-red-50 p-4 text-red-700">{t('notFound')}</p>;
@@ -28,6 +28,8 @@ export default function OrderView({ orderNo, phone, isNew }) {
         <p className="w-full text-sm text-ink-faint">{dt(order.created_at)}</p>
       </div>
       <OrderTimeline status={order.status} history={order.history} />
+      {['received', 'pending_payment'].includes(order.status) || Number(order.paid) < Number(order.total)
+        ? <PaymentBox order={order} phone={phone} onChanged={load} /> : null}
       <table className="tbl card overflow-hidden">
         <thead><tr><th>{t('products')}</th><th className="text-right">{t('qty')}</th><th className="text-right">{t('price')}</th><th className="text-right">{t('total')}</th></tr></thead>
         <tbody>
