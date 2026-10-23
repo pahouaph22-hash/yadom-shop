@@ -33,6 +33,7 @@ function LoginForm() {
       <h1 className="font-display text-2xl font-bold">{t('login')}</h1>
       <label className="block"><span className="label">{t('email')}</span><input required type="email" autoComplete="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
       <label className="block"><span className="label">{t('password')}</span><input required type="password" autoComplete="current-password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
+      <p className="-mt-2 text-right text-sm"><Link href="/forgot" className="text-jade hover:underline">{t('forgot')}</Link></p>
       {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
       <button disabled={busy} className="btn-primary w-full">{t('login')}</button>
       <p className="text-center text-sm text-ink-soft">{t('noAccount')} <Link href="/register" className="font-semibold text-jade">{t('register')}</Link></p>
