@@ -5,12 +5,14 @@ import { getSupabase } from '@/lib/supabase/client';
 import OrderTimeline from './OrderTimeline';
 import PaymentBox from './PaymentBox';
 import ShipmentBox from './ShipmentBox';
+import CancelOrder from './CancelOrder';
 import Link from 'next/link';
 import { dt } from '@/lib/format';
 
 export default function OrderView({ orderNo, phone, isNew }) {
-  const { t, fmt } = useShop();
+  const { t, fmt, user, isCustomer } = useShop();
   const [order, setOrder] = useState(undefined);
+  const [cancelled, setCancelled] = useState(false);
   const load = () => getSupabase().rpc('track_order', { p_order_no: orderNo, p_phone: phone }).then(({ data }) => setOrder(data || null));
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [orderNo, phone]);
 
@@ -32,6 +34,12 @@ export default function OrderView({ orderNo, phone, isNew }) {
       <OrderTimeline status={order.status} history={order.history} />
       {['received', 'pending_payment'].includes(order.status) || Number(order.paid) < Number(order.total)
         ? <PaymentBox order={order} phone={phone} onChanged={load} /> : null}
+      {cancelled && <p className="rounded-lg bg-jade-mist p-3 text-sm font-semibold text-jade">✓ {t('orderCancelledMsg')}</p>}
+      {user && isCustomer && ['received', 'pending_payment'].includes(order.status) && (
+        Number(order.paid) === 0 && !(order.slips || []).some((s) => s.status === 'pending')
+          ? <div className="flex justify-end"><CancelOrder orderNo={order.order_no} onDone={() => { setCancelled(true); load(); }} /></div>
+          : <p className="text-right text-xs text-ink-faint">{t('cancelContactShop')}</p>
+      )}
       <ShipmentBox order={order} phone={phone} />
       <table className="tbl card overflow-hidden">
         <thead><tr><th>{t('products')}</th><th className="text-right">{t('qty')}</th><th className="text-right">{t('price')}</th><th className="text-right">{t('total')}</th></tr></thead>

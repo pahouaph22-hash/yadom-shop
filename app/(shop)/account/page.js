@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useShop } from '@/components/Providers';
 import MemberFields, { EMPTY_MEMBER } from '@/components/MemberFields';
 import StaffSessionNotice from '@/components/StaffSessionNotice';
+import CancelOrder from '@/components/CancelOrder';
 import { getSupabase } from '@/lib/supabase/client';
 import { logout } from '@/lib/logout';
 import { withBase } from '@/lib/base';
@@ -29,7 +30,7 @@ function orderLink(o) {
   return `/order?no=${encodeURIComponent(o.order_no)}&phone=${encodeURIComponent(o.ship_phone || '')}`;
 }
 
-function OrderCard({ o, t, fmt }) {
+function OrderCard({ o, t, fmt, onChanged }) {
   const due = Number(o.total) - Number(o.paid);
   const open = !['cancelled', 'refunded'].includes(o.status);
   return (
@@ -51,6 +52,7 @@ function OrderCard({ o, t, fmt }) {
           {open && due > 0 && <Link href={orderLink(o)} className="btn-gold btn-sm">{t('payOrder')}</Link>}
           <Link href={orderLink(o)} className="btn-ghost btn-sm">{t('details')}</Link>
         </div>
+        {o.can_cancel && <div className="flex w-full justify-end"><CancelOrder small orderNo={o.order_no} onDone={onChanged} /></div>}
       </div>
     </li>
   );
@@ -188,7 +190,7 @@ function Account() {
                       <div className="rounded-xl border border-dashed border-line p-8 text-center text-ink-soft">
                         <p>{t('noOrders')}</p><Link href="/#products" className="btn-primary mt-4">{t('shopNow')}</Link>
                       </div>
-                    ) : <ul className="grid gap-3 lg:grid-cols-2">{orders.slice(0, 4).map((o) => <OrderCard key={o.id} o={o} t={t} fmt={fmt} />)}</ul>}
+                    ) : <ul className="grid gap-3 lg:grid-cols-2">{orders.slice(0, 4).map((o) => <OrderCard key={o.id} o={o} t={t} fmt={fmt} onChanged={() => { setMsg({ ok: t('orderCancelledMsg') }); load(); }} />)}</ul>}
                   </div>
                 </div>
               )}
@@ -204,7 +206,7 @@ function Account() {
                     const list = orders.filter((o) => !filter || (filter === 'open' ? ['received', 'pending_payment', 'paid', 'shipping'].includes(o.status) : filter === 'cancelled' ? ['cancelled', 'refunded'].includes(o.status) : o.status === filter));
                     return list.length === 0
                       ? <p className="rounded-xl border border-dashed border-line p-8 text-center text-ink-soft">{t('noOrders')}</p>
-                      : <ul className="grid gap-3 lg:grid-cols-2">{list.map((o) => <OrderCard key={o.id} o={o} t={t} fmt={fmt} />)}</ul>;
+                      : <ul className="grid gap-3 lg:grid-cols-2">{list.map((o) => <OrderCard key={o.id} o={o} t={t} fmt={fmt} onChanged={() => { setMsg({ ok: t('orderCancelledMsg') }); load(); }} />)}</ul>;
                   })()}
                 </div>
               )}
