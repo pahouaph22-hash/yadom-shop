@@ -1,0 +1,19 @@
+name: keep-supabase-awake
+# Supabase free projects pause after ~7 days without activity, which would take the shop offline.
+# This makes one tiny read-only request every day so the database stays awake.
+on:
+  schedule:
+    - cron: '17 1 * * *'   # 08:17 Vientiane time, daily
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read the public product list
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "https://kjicxvauflyjfqhjijsh.supabase.co/rest/v1/rpc/shop_products" \
+            -H "apikey: sb_publishable_fD1kboE_qu0uJQGT1ZrCCQ_ol37RWpt" \
+            -H "Content-Type: application/json" -d '{}')
+          echo "Supabase responded $code"
+          test "$code" = "200"

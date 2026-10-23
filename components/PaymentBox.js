@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useShop } from './Providers';
 import { getSupabase } from '@/lib/supabase/client';
 import { dt, errMsg } from '@/lib/format';
+import { compressImage } from '@/lib/image';
 
 const SLIP_CLS = { pending: 'bg-saffron-pale text-saffron-deep', approved: 'bg-jade-mist text-jade', rejected: 'bg-red-50 text-red-700' };
 
@@ -21,12 +22,13 @@ export default function PaymentBox({ order, phone, onChanged }) {
   async function send(e) {
     e.preventDefault();
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) return setState({ error: t('fileTooBig') });
     setState({ busy: true });
+    const upFile = await compressImage(file, { maxSide: 2000, quality: 0.85 });
+    if (upFile.size > 5 * 1024 * 1024) return setState({ error: t('fileTooBig') });
     const sb = getSupabase();
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    const ext = (upFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
     const path = `${order.order_no}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const up = await sb.storage.from('payment-slips').upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
+    const up = await sb.storage.from('payment-slips').upload(path, upFile, { contentType: upFile.type || 'image/jpeg', upsert: false });
     if (up.error) return setState({ error: errMsg(up.error) });
     const { error } = await sb.rpc('submit_slip', {
       p_order_no: order.order_no, p_phone: phone, p_file_path: path, p_amount: Number(amount) || null, p_note: note || null,

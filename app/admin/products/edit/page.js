@@ -7,6 +7,7 @@ import { getSupabase } from '@/lib/supabase/client';
 import { useShop } from '@/components/Providers';
 import { PageHead, Alert, Modal, useLoad } from '@/components/admin/ui';
 import { kip, dt, errMsg } from '@/lib/format';
+import { compressImage } from '@/lib/image';
 
 const EMPTY = {
   sku: '', name_lo: '', name_th: '', name_en: '', description_lo: '', description_th: '', description_en: '', size_label: '',
@@ -41,7 +42,8 @@ function ProductEdit({ params }) {
     setBusy(true); setMsg({});
     const sb = getSupabase();
     const urls = [];
-    for (const file of files) {
+    for (const raw of files) {
+      const file = await compressImage(raw);
       if (file.size > 5 * 1024 * 1024) { setMsg({ error: `${file.name}: ไฟล์ใหญ่เกิน 5MB` }); continue; }
       const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const path = `${f.sku || 'product'}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;

@@ -5,6 +5,7 @@ import { Alert, Modal, SecTitle } from './ui';
 import { CARRIERS, carrierLabel, waNumber } from '@/lib/carriers';
 import { dt, errMsg } from '@/lib/format';
 import { withBase } from '@/lib/base';
+import { compressImage } from '@/lib/image';
 
 const BLANK = { carrier: 'anousith', carrier_name: '', tracking_no: '', branch: '', branch_phone: '', note: '', files: [] };
 
@@ -40,7 +41,8 @@ export default function ShipmentPanel({ order, onChanged }) {
     setBusy(true); setMsg({});
     const sb = getSupabase();
     const urls = [];
-    for (const f of files) {
+    for (const raw of files) {
+      const f = await compressImage(raw, { maxSide: 2000, quality: 0.85 });
       if (f.size > 5 * 1024 * 1024) { setMsg({ error: `${f.name}: ไฟล์ใหญ่เกิน 5MB` }); continue; }
       const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
       const path = `${order.order_no}/${crypto.randomUUID()}.${ext}`;

@@ -10,21 +10,34 @@ jobs:
   dump:
     runs-on: ubuntu-latest
     steps:
+      - name: Check the secret is set
+        id: check
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::notice::SUPABASE_DB_URL secret is not set yet — skipping the backup (see README)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Install PostgreSQL 17 client
+        if: steps.check.outputs.ready == 'true'
         run: |
           sudo apt-get install -y wget ca-certificates
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc >/dev/null
           sudo apt-get update && sudo apt-get install -y postgresql-client-17
       - name: Dump
+        if: steps.check.outputs.ready == 'true'
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          test -n "$DB_URL" || { echo "SUPABASE_DB_URL secret is not set"; exit 1; }
           STAMP=$(date -u +%Y%m%d-%H%M)
           /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --schema=public --no-owner --no-privileges -Fc -f yadom-$STAMP.dump
           /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --schema=auth --data-only --table=auth.users -Fc -f yadom-auth-users-$STAMP.dump
       - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.ready == 'true'
         with:
           name: yadom-db-backup
           path: '*.dump'

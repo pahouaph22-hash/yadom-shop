@@ -93,9 +93,10 @@ function OrderDetail({ params }) {
         {closed && <p className="mb-3 rounded-lg bg-slate-50 p-2 text-center text-sm text-slate-600">คำสั่งซื้อนี้ {STATUS_TH[o.status]} แล้ว</p>}
         <div className="flex flex-wrap items-center gap-2">
           {NEXT[o.status].length > 0 && <span className="mr-1 text-xs font-medium text-ink-soft">เปลี่ยนสถานะ:</span>}
-          {NEXT[o.status].map((s) => (
+          {NEXT[o.status].filter((s) => !(s === 'cancelled' && net > 0)).map((s) => (
             <button key={s} onClick={() => changeStatus(s)} className={s === 'cancelled' ? 'btn-danger btn-sm' : 'btn-ghost btn-sm'}>{s === 'cancelled' ? '✕' : '→'} {STATUS_TH[s]}</button>
           ))}
+          {NEXT[o.status].includes('cancelled') && net > 0 && <span className="text-xs text-ink-faint">(ยกเลิกได้หลังคืนเงินครบ)</span>}
           <span className="flex-1" />
           {!closed && outstanding > 0 && <button onClick={() => { setMsg({}); setModal('pay'); }} className="btn-gold btn-sm">💰 บันทึกการชำระเงิน</button>}
           {isAdmin && net > 0 && <button onClick={() => { setMsg({}); setModal('refund'); }} className="btn-danger btn-sm">↩ คืนเงิน</button>}
