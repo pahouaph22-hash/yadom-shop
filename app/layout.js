@@ -13,6 +13,12 @@ export default function RootLayout({ children }) {
       <head>
         {/* Browser auto-translate rewrites the DOM and crashes React; the site already has its own Lao/Thai/English switch */}
         <meta name="google" content="notranslate" />
+        {/* Safety net: if a translator/extension still rewrites text nodes, keep React from crashing */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){if(typeof Node!=='function'||!Node.prototype)return;var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c.parentNode!==this){return c;}return r.apply(this,arguments);};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this){return n;}return i.apply(this,arguments);};})();`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
