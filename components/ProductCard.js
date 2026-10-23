@@ -27,13 +27,13 @@ export default function ProductCard({ p }) {
   const out = p.stock <= 0;
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white">
-      <Link href={`/product/${p.id}`} className="block aspect-[4/5] overflow-hidden bg-jade-mist">
+      <Link href={`/product?id=${p.id}`} className="block aspect-[4/5] overflow-hidden bg-jade-mist">
         {p.images?.[0]
           ? <img src={p.images[0]} alt={productName(p, lang)} className="h-full w-full object-cover" loading="lazy" />
           : <InhalerArt className="h-full w-full" />}
       </Link>
       <div className="flex flex-1 flex-col gap-1 p-4">
-        <Link href={`/product/${p.id}`} className="font-display text-lg font-bold leading-snug text-ink hover:text-jade">{productName(p, lang)}</Link>
+        <Link href={`/product?id=${p.id}`} className="font-display text-lg font-bold leading-snug text-ink hover:text-jade">{productName(p, lang)}</Link>
         {p.size_label && <p className="text-xs text-ink-faint">{p.size_label}</p>}
         <p className="mt-1 text-lg font-bold text-jade">{fmt(p.price_retail)}</p>
         {p.price_wholesale != null && (

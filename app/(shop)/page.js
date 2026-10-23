@@ -1,8 +1,16 @@
-import { getServerSupabase } from '@/lib/supabase/server';
+'use client';
+import { useEffect, useState } from 'react';
+import { getSupabase } from '@/lib/supabase/client';
 import Home from '@/components/Home';
+import { errMsg } from '@/lib/format';
 
-export default async function Page() {
-  const sb = getServerSupabase();
-  const { data, error } = await sb.rpc('shop_products');
-  return <Home products={data || []} loadError={error ? error.message : null} />;
+export default function Page() {
+  const [products, setProducts] = useState(null);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    getSupabase().rpc('shop_products').then(({ data, error: e }) => {
+      if (e) setError(errMsg(e)); else setProducts(data || []);
+    });
+  }, []);
+  return <Home products={products || []} loading={products === null && !error} loadError={error} />;
 }

@@ -27,7 +27,7 @@ export default function CustomersPage() {
       <PageHead title="ลูกค้า" sub={`${list.length} ราย`}>
         <button className="btn-ghost" onClick={() => exportCSV(`customers-${Date.now()}.csv`, list, COLS)}>ส่งออก CSV</button>
         <button className="btn-ghost" onClick={() => exportXLSX(`customers-${Date.now()}.xlsx`, [{ name: 'Customers', rows: list, cols: COLS }])}>ส่งออก Excel</button>
-        <Link href="/admin/customers/new" className="btn-primary">+ เพิ่มลูกค้า</Link>
+        <Link href="/admin/customers/edit?id=new" className="btn-primary">+ เพิ่มลูกค้า</Link>
       </PageHead>
       <div className="mb-4 flex flex-wrap gap-3">
         <input className="input max-w-xs" placeholder="ค้นหาชื่อ / เบอร์ / อีเมล" value={q} onChange={(e) => setQ(e.target.value)} aria-label="ค้นหา" />
@@ -47,7 +47,7 @@ export default function CustomersPage() {
             <tbody>
               {list.map((c) => (
                 <tr key={c.id}>
-                  <td><Link href={`/admin/customers/${c.id}`} className="font-semibold text-jade hover:underline">{c.name}</Link><div className="text-xs text-ink-faint">{c.phone}{c.province ? ` · ${c.province}` : ''}</div></td>
+                  <td><Link href={`/admin/customers/edit?id=${c.id}`} className="font-semibold text-jade hover:underline">{c.name}</Link><div className="text-xs text-ink-faint">{c.phone}{c.province ? ` · ${c.province}` : ''}</div></td>
                   <td className="text-xs">{CTYPE_TH[c.type]}</td>
                   <td className="text-right">{c.orders_count}</td>
                   <td className="text-right font-semibold">{kip(c.total_spent)}</td>

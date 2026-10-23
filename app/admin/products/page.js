@@ -24,7 +24,7 @@ export default function ProductsPage() {
           { key: 'unit_cost', label: 'ต้นทุน' }, { key: 'packaging_cost', label: 'ค่าบรรจุภัณฑ์' }, { key: 'stock', label: 'คงเหลือ' },
           { key: (p) => (p.deleted_at ? 'ลบแล้ว' : p.is_active ? 'เปิดขาย' : 'ปิดขาย'), label: 'สถานะ' },
         ])}>ส่งออก CSV</button>
-        <Link href="/admin/products/new" className="btn-primary">+ เพิ่มสินค้า</Link>
+        <Link href="/admin/products/edit?id=new" className="btn-primary">+ เพิ่มสินค้า</Link>
       </PageHead>
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <input className="input max-w-xs" placeholder="ค้นหาชื่อหรือ SKU" value={q} onChange={(e) => setQ(e.target.value)} aria-label="ค้นหา" />
@@ -39,7 +39,7 @@ export default function ProductsPage() {
               {list.map((p) => (
                 <tr key={p.id} className={p.deleted_at ? 'opacity-50' : ''}>
                   <td className="w-12">{p.images?.[0] ? <img src={p.images[0]} alt="" className="h-10 w-10 rounded object-cover" /> : <div className="h-10 w-10 rounded bg-jade-mist" />}</td>
-                  <td><Link href={`/admin/products/${p.id}`} className="font-semibold text-jade hover:underline">{p.name_lo}</Link><div className="text-xs text-ink-faint">{p.sku}{p.size_label ? ` · ${p.size_label}` : ''}</div></td>
+                  <td><Link href={`/admin/products/edit?id=${p.id}`} className="font-semibold text-jade hover:underline">{p.name_lo}</Link><div className="text-xs text-ink-faint">{p.sku}{p.size_label ? ` · ${p.size_label}` : ''}</div></td>
                   <td className="text-right">{kip(p.price_retail)}</td>
                   <td className="text-right">{p.price_wholesale != null ? <>{kip(p.price_wholesale)}<div className="text-xs text-ink-faint">≥ {p.wholesale_min_qty}</div></> : '—'}</td>
                   <td className="text-right">{kip(Number(p.unit_cost) + Number(p.packaging_cost))}</td>

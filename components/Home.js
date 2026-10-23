@@ -5,7 +5,7 @@ import ProductCard, { InhalerArt } from './ProductCard';
 import { pickLang } from '@/lib/format';
 import { ChannelIcon, channelHref, CHANNEL_LABEL } from './channels';
 
-export default function Home({ products, loadError }) {
+export default function Home({ products, loading, loadError }) {
   const { t, lang, settings, channels, currency } = useShop();
   const heroImg = products.find((p) => p.images?.length)?.images[0];
   const name = pickLang(settings.store_name, lang) || 'ຢາດົມຫອມລາວ';
@@ -46,7 +46,9 @@ export default function Home({ products, loadError }) {
         <h2 className="font-display text-3xl font-bold text-ink">{t('ourProducts')}</h2>
         {currency === 'THB' && <p className="mt-1 text-xs text-ink-faint">{t('thbNote')}</p>}
         {loadError && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{loadError}</p>}
-        {products.length === 0 && !loadError ? (
+        {loading ? (
+          <p className="mt-6 text-ink-soft">…</p>
+        ) : products.length === 0 && !loadError ? (
           <p className="mt-6 rounded-xl border border-dashed border-line p-10 text-center text-ink-soft">—</p>
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">

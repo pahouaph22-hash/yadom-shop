@@ -127,7 +127,7 @@ export default function ReportsPage() {
           <tbody>
             {(prods || []).map((p) => (
               <tr key={p.product_id}>
-                <td><Link href={`/admin/products/${p.product_id}`} className="text-jade hover:underline">{p.name}</Link> <span className="text-xs text-ink-faint">{p.sku}</span></td>
+                <td><Link href={`/admin/products/edit?id=${p.product_id}`} className="text-jade hover:underline">{p.name}</Link> <span className="text-xs text-ink-faint">{p.sku}</span></td>
                 <td className="text-right">{p.qty_sold}</td><td className="text-right">{kip(p.sales)}</td><td className="text-right">{kip(p.cogs)}</td><td className="text-right font-semibold">{p.stock}</td>
               </tr>
             ))}

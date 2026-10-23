@@ -54,7 +54,7 @@ export default function CartPage() {
       sessionStorage.removeItem('yd_checkout');
     } catch { /* ignore */ }
     clearCart();
-    router.push(`/order/${encodeURIComponent(data.order_no)}?phone=${encodeURIComponent(form.phone)}&new=1`);
+    router.push(`/order?no=${encodeURIComponent(data.order_no)}&phone=${encodeURIComponent(form.phone)}&new=1`);
   }
 
   if (!cart.length) {

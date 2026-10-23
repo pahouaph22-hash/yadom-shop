@@ -70,8 +70,8 @@ export default function ExpensesPage() {
                   <td className="whitespace-nowrap text-xs">{d(r.expense_date)}</td>
                   <td className="text-xs">{EXP_TH[r.category]}</td>
                   <td>{r.description}<div className="text-xs text-ink-faint">{[r.supplier, r.reference].filter(Boolean).join(' · ')}
-                    {r.order_id && <> · <Link className="text-jade" href={`/admin/orders/${r.order_id}`}>{r.orders?.order_no}</Link></>}
-                    {r.product_id && <> · <Link className="text-jade" href={`/admin/products/${r.product_id}`}>{r.products?.name_lo}</Link></>}</div></td>
+                    {r.order_id && <> · <Link className="text-jade" href={`/admin/orders/view?id=${r.order_id}`}>{r.orders?.order_no}</Link></>}
+                    {r.product_id && <> · <Link className="text-jade" href={`/admin/products/edit?id=${r.product_id}`}>{r.products?.name_lo}</Link></>}</div></td>
                   <td className="text-right font-semibold">{kip(r.amount)}</td>
                   <td className="whitespace-nowrap text-right"><button className="btn-ghost btn-sm" onClick={() => { setMsg({}); setEdit({ ...r }); }}>แก้ไข</button> <button className="btn-danger btn-sm" onClick={() => remove(r)}>ลบ</button></td>
                 </tr>

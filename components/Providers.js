@@ -23,6 +23,7 @@ export default function Providers({ children, initialSettings = {}, initialChann
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [ready, setReady] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     setLangState(load('yd_lang', 'lo'));
@@ -42,15 +43,20 @@ export default function Providers({ children, initialSettings = {}, initialChann
     if (s) setSettings(Object.fromEntries(s.map((r) => [r.key, r.value])));
     if (c) setChannels(c);
   }, []);
+  useEffect(() => { refreshSettings(); }, [refreshSettings]);
 
   useEffect(() => {
     const sb = getSupabase();
     const apply = async (session) => {
-      setUser(session?.user ?? null);
+      // resolve the role before publishing the user, so guards never see "signed in but no role yet"
+      let r = null;
       if (session?.user) {
         const { data } = await sb.rpc('my_role');
-        setRole(data);
-      } else setRole(null);
+        r = data;
+      }
+      setUser(session?.user ?? null);
+      setRole(r);
+      setAuthReady(true);
     };
     sb.auth.getSession().then(({ data }) => apply(data.session));
     const { data: sub } = sb.auth.onAuthStateChange((_e, session) => apply(session));
@@ -60,7 +66,7 @@ export default function Providers({ children, initialSettings = {}, initialChann
   const value = useMemo(() => {
     const rate = Number(settings.thb_rate) || 650;
     return {
-      lang, currency, cart, settings, channels, user, role, ready, rate,
+      lang, currency, cart, settings, channels, user, role, ready, authReady, rate,
       isStaff: role === 'admin' || role === 'staff',
       isAdmin: role === 'admin',
       t: (k, v) => translate(lang, k, v),
@@ -82,7 +88,7 @@ export default function Providers({ children, initialSettings = {}, initialChann
       removeFromCart: (id) => setCart((c) => c.filter((x) => x.id !== id)),
       clearCart: () => setCart([]),
     };
-  }, [lang, currency, cart, settings, channels, user, role, ready, refreshSettings]);
+  }, [lang, currency, cart, settings, channels, user, role, ready, authReady, refreshSettings]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

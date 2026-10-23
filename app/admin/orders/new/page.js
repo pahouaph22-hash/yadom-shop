@@ -54,7 +54,7 @@ export default function NewOrder() {
     });
     setBusy(false);
     if (err) return setError(errMsg(err));
-    router.push(`/admin/orders/${data.order_id}`);
+    router.push(`/admin/orders/view?id=${data.order_id}`);
   }
 
   return (

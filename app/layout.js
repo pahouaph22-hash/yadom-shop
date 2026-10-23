@@ -1,8 +1,5 @@
 import './globals.css';
 import Providers from '@/components/Providers';
-import { getServerSupabase } from '@/lib/supabase/server';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao',
@@ -10,19 +7,7 @@ export const metadata = {
 };
 export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#0F4C3A' };
 
-export default async function RootLayout({ children }) {
-  let settings = {};
-  let channels = [];
-  try {
-    const sb = getServerSupabase();
-    const [{ data: s }, { data: c }] = await Promise.all([
-      sb.from('settings').select('key,value'),
-      sb.from('contact_channels').select('*').eq('is_active', true).order('sort'),
-    ]);
-    settings = Object.fromEntries((s || []).map((r) => [r.key, r.value]));
-    channels = c || [];
-  } catch { /* render with defaults */ }
-
+export default function RootLayout({ children }) {
   return (
     <html lang="lo">
       <head>
@@ -34,7 +19,7 @@ export default async function RootLayout({ children }) {
         />
       </head>
       <body className="font-sans antialiased">
-        <Providers initialSettings={settings} initialChannels={channels}>{children}</Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

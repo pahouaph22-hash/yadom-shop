@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase/client';
 import { errMsg } from '@/lib/format';
 
@@ -81,5 +82,5 @@ export function Stat({ label, value, tone = 'jade', href }) {
       <p className={`mt-1 text-2xl font-bold ${tones[tone]}`}>{value}</p>
     </>
   );
-  return href ? <a href={href} className="card block p-4 hover:border-jade">{body}</a> : <div className="card p-4">{body}</div>;
+  return href ? <Link href={href} className="card block p-4 hover:border-jade">{body}</Link> : <div className="card p-4">{body}</div>;
 }

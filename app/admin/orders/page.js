@@ -98,7 +98,7 @@ function OrdersInner() {
                 const net = Number(o.paid_amount) - Number(o.refunded_amount);
                 return (
                   <tr key={o.id}>
-                    <td><Link href={`/admin/orders/${o.id}`} className="font-semibold text-jade hover:underline">{o.order_no}</Link>{o.is_wholesale && <span className="ml-1 rounded bg-saffron-pale px-1 text-xs text-saffron-deep">ส่ง</span>}</td>
+                    <td><Link href={`/admin/orders/view?id=${o.id}`} className="font-semibold text-jade hover:underline">{o.order_no}</Link>{o.is_wholesale && <span className="ml-1 rounded bg-saffron-pale px-1 text-xs text-saffron-deep">ส่ง</span>}</td>
                     <td className="whitespace-nowrap text-xs">{dt(o.created_at)}</td>
                     <td>{o.customers?.name}<div className="text-xs text-ink-faint">{o.ship_phone}</div></td>
                     <td className="text-xs">{CHANNEL_TH[o.channel]}</td>

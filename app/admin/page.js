@@ -56,7 +56,7 @@ export default function Dashboard() {
               <tbody>
                 {d.recent_orders.map((o) => (
                   <tr key={o.id}>
-                    <td><Link href={`/admin/orders/${o.id}`} className="font-semibold text-jade hover:underline">{o.order_no}</Link><div className="text-xs text-ink-faint">{dt(o.created_at)}</div></td>
+                    <td><Link href={`/admin/orders/view?id=${o.id}`} className="font-semibold text-jade hover:underline">{o.order_no}</Link><div className="text-xs text-ink-faint">{dt(o.created_at)}</div></td>
                     <td>{o.customer}</td>
                     <td><StatusBadge s={o.status} /></td>
                     <td className="text-right">{kip(o.total)}</td>
@@ -73,7 +73,7 @@ export default function Dashboard() {
             <ul className="divide-y divide-line">
               {d.low_stock.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-2 text-sm">
-                  <Link href={`/admin/products/${p.id}`} className="hover:text-jade">{p.name} <span className="text-ink-faint">({p.sku})</span></Link>
+                  <Link href={`/admin/products/edit?id=${p.id}`} className="hover:text-jade">{p.name} <span className="text-ink-faint">({p.sku})</span></Link>
                   <span className={`font-bold ${p.stock === 0 ? 'text-red-700' : 'text-saffron-deep'}`}>{p.stock} / แจ้งเตือนที่ {p.threshold}</span>
                 </li>
               ))}

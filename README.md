@@ -3,13 +3,21 @@
 Next.js 14 + Supabase (โปรเจกต์ `yadom-shop`, ref `kjicxvauflyjfqhjijsh`, region Singapore)
 แยกจากฐานข้อมูล RubberLedger โดยสิ้นเชิง
 
+## เว็บไซต์
+- **GitHub Pages:** https://pahouaph22-hash.github.io/yadom-shop/ (deploy อัตโนมัติทุกครั้งที่ push เข้า `main` ผ่าน `.github/workflows/pages.yml`)
+- **Vercel (สำรอง):** https://yadom-shop-one.vercel.app
+
+เว็บเป็น static ทั้งหมด (`output: 'export'`) เบราว์เซอร์คุยกับ Supabase โดยตรง ความปลอดภัยของข้อมูลอยู่ที่ Row Level Security ในฐานข้อมูล
+ส่วนการกันหน้า /admin ในเว็บเป็นแค่เรื่องการใช้งาน
+
 ## เริ่มใช้งาน (ครั้งแรก)
-1. **Deploy บน Vercel** — Import repo นี้ → ใส่ Environment Variables:
-   - `NEXT_PUBLIC_SUPABASE_URL` = `https://kjicxvauflyjfqhjijsh.supabase.co`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `sb_publishable_fD1kboE_qu0uJQGT1ZrCCQ_ol37RWpt` (คีย์สาธารณะ ปลอดภัยที่จะใส่ฝั่งเว็บ)
-2. **Supabase → Authentication → URL Configuration** ใส่ Site URL เป็นโดเมน Vercel ของคุณ (เพื่อให้ลิงก์ยืนยันอีเมลกลับมาถูกที่)
-3. **สมัครสมาชิกด้วย `larmouamua@gmail.com`** (หรือ `pahouaph22@gmail.com`) ที่หน้า `/register` → ยืนยันอีเมล → บัญชีนี้จะเป็น **ผู้ดูแลระบบ** อัตโนมัติ
-4. เข้า `/admin` → ตั้งค่า → เพิ่มช่องทางติดต่อ (WhatsApp, Facebook, TikTok…) และข้อมูลการชำระเงิน
+1. **เปิด GitHub Pages:** repo → Settings → Pages → Build and deployment → Source: **GitHub Actions**
+   จากนั้นแท็บ Actions → "deploy-github-pages" → Run workflow
+2. **Supabase → Authentication → URL Configuration**
+   - Site URL: `https://pahouaph22-hash.github.io/yadom-shop/`
+   - Redirect URLs: `https://pahouaph22-hash.github.io/yadom-shop/**` และ `https://yadom-shop-one.vercel.app/**`
+3. **สมัครสมาชิกด้วย `larmouamua@gmail.com`** (หรือ `pahouaph22@gmail.com`) ที่หน้า `/register` → ยืนยันอีเมล → เป็น **ผู้ดูแลระบบ** อัตโนมัติ
+4. เข้า `/admin` → ตั้งค่า → เพิ่มช่องทางติดต่อ และข้อมูลการชำระเงิน
 5. สินค้าและสต็อก → เพิ่มสินค้าจริง พร้อมรูป ราคาปลีก/ส่ง ต้นทุน และสต็อกเริ่มต้น
 6. ให้พนักงานสมัครที่ `/register` แล้วกำหนดสิทธิ์ “พนักงาน” ในหน้าตั้งค่า
 

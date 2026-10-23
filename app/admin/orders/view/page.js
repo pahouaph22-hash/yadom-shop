@@ -1,6 +1,7 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useShop } from '@/components/Providers';
 import { PageHead, StatusBadge, Alert, Modal, useLoad, STATUS_TH, PM_TH, CHANNEL_TH, CTYPE_TH } from '@/components/admin/ui';
@@ -16,7 +17,7 @@ const NEXT = {
 };
 const EVENT_TH = { created: 'สร้างคำสั่งซื้อ', status: 'เปลี่ยนสถานะ', edit: 'แก้ไขคำสั่งซื้อ', payment: 'รับชำระเงิน', refund: 'คืนเงิน', note: 'บันทึก' };
 
-export default function OrderDetail({ params }) {
+function OrderDetail({ params }) {
   const id = params.id;
   const { isAdmin } = useShop();
   const [data, reload, loadErr] = useLoad(async (sb) => {
@@ -124,7 +125,7 @@ export default function OrderDetail({ params }) {
         <div className="space-y-6">
           <section className="card p-4 text-sm">
             <h2 className="mb-3 font-semibold">ลูกค้าและการจัดส่ง</h2>
-            <p><Link href={`/admin/customers/${o.customer_id}`} className="font-semibold text-jade hover:underline">{o.customers?.name}</Link> <span className="text-xs text-ink-faint">({CTYPE_TH[o.customers?.type]})</span></p>
+            <p><Link href={`/admin/customers/edit?id=${o.customer_id}`} className="font-semibold text-jade hover:underline">{o.customers?.name}</Link> <span className="text-xs text-ink-faint">({CTYPE_TH[o.customers?.type]})</span></p>
             <dl className="mt-3 space-y-2">
               <div><dt className="text-xs text-ink-faint">ผู้รับ</dt><dd>{o.ship_name} · <a className="text-jade" href={`tel:${o.ship_phone}`}>{o.ship_phone}</a></dd></div>
               <div><dt className="text-xs text-ink-faint">ที่อยู่จัดส่ง</dt><dd className="whitespace-pre-line">{o.ship_address || '—'}</dd></div>
@@ -267,4 +268,15 @@ function ItemsModal({ o, items, onClose, run, err }) {
       </form>
     </Modal>
   );
+}
+
+
+function WithQuery() {
+  const sp = useSearchParams();
+  const id = sp.get('id') || '';
+  return <OrderDetail key={id} params={{ id }} />;
+}
+
+export default function Page() {
+  return <Suspense fallback={<p className="text-ink-soft">กำลังโหลด…</p>}><WithQuery /></Suspense>;
 }

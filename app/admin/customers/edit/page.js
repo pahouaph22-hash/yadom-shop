@@ -1,13 +1,14 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useShop } from '@/components/Providers';
 import { PageHead, Alert, StatusBadge, Stat, useLoad, CTYPE_TH } from '@/components/admin/ui';
 import { kip, dt, errMsg } from '@/lib/format';
 
-export default function CustomerPage({ params }) {
+function CustomerPage({ params }) {
   const isNew = params.id === 'new';
   const router = useRouter();
   const { isAdmin } = useShop();
@@ -33,7 +34,7 @@ export default function CustomerPage({ params }) {
     const sb = getSupabase();
     const res = isNew ? await sb.from('customers').insert(row).select('id').single() : await sb.from('customers').update(row).eq('id', params.id).select('id').single();
     if (res.error) return setMsg({ error: res.error.code === '23505' ? 'เบอร์โทรนี้มีลูกค้าอยู่แล้ว' : errMsg(res.error) });
-    if (isNew) router.replace(`/admin/customers/${res.data.id}`); else { setMsg({ ok: 'บันทึกแล้ว' }); load(); }
+    if (isNew) router.replace(`/admin/customers/edit?id=${res.data.id}`); else { setMsg({ ok: 'บันทึกแล้ว' }); load(); }
   }
   async function remove() {
     if (!window.confirm('ลบลูกค้ารายนี้? (ลบได้เฉพาะลูกค้าที่ยังไม่มีคำสั่งซื้อ)')) return;
@@ -81,7 +82,7 @@ export default function CustomerPage({ params }) {
                 <tbody>
                   {orders.map((o) => (
                     <tr key={o.id}>
-                      <td><Link href={`/admin/orders/${o.id}`} className="font-semibold text-jade hover:underline">{o.order_no}</Link></td>
+                      <td><Link href={`/admin/orders/view?id=${o.id}`} className="font-semibold text-jade hover:underline">{o.order_no}</Link></td>
                       <td className="text-xs">{dt(o.created_at)}</td><td><StatusBadge s={o.status} /></td>
                       <td className="text-right">{kip(o.total)}</td><td className="text-right">{kip(Number(o.paid_amount) - Number(o.refunded_amount))}</td>
                     </tr>
@@ -94,4 +95,15 @@ export default function CustomerPage({ params }) {
       </div>
     </>
   );
+}
+
+
+function WithQuery() {
+  const sp = useSearchParams();
+  const id = sp.get('id') || '';
+  return <CustomerPage key={id} params={{ id }} />;
+}
+
+export default function Page() {
+  return <Suspense fallback={<p className="text-ink-soft">กำลังโหลด…</p>}><WithQuery /></Suspense>;
 }

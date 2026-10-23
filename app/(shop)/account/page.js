@@ -1,13 +1,16 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useShop } from '@/components/Providers';
 import { getSupabase } from '@/lib/supabase/client';
 import { logout } from '@/lib/logout';
 import { dt } from '@/lib/format';
 
 export default function AccountPage() {
-  const { t, fmt, user, isStaff } = useShop();
+  const { t, fmt, user, isStaff, authReady } = useShop();
+  const router = useRouter();
+  useEffect(() => { if (authReady && !user) router.replace('/login?next=/account'); }, [authReady, user, router]);
   const [orders, setOrders] = useState(null);
   useEffect(() => {
     if (!user) return;
@@ -32,7 +35,7 @@ export default function AccountPage() {
         <ul className="mt-6 divide-y divide-line rounded-xl border border-line bg-white">
           {orders.map((o) => (
             <li key={o.id}>
-              <Link href={`/order/${o.order_no}?phone=${encodeURIComponent(o.ship_phone || '')}`} className="flex items-center justify-between gap-3 p-4 hover:bg-jade-wash">
+              <Link href={`/order?no=${o.order_no}&phone=${encodeURIComponent(o.ship_phone || '')}`} className="flex items-center justify-between gap-3 p-4 hover:bg-jade-wash">
                 <span><span className="font-semibold">{o.order_no}</span><span className="block text-xs text-ink-faint">{dt(o.created_at)}</span></span>
                 <span className="text-sm">{t(`st_${o.status}`)}</span>
                 <span className="font-semibold">{fmt(o.total)}</span>

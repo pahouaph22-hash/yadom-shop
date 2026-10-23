@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useShop } from '@/components/Providers';
 import { logout } from '@/lib/logout';
 
@@ -20,8 +20,19 @@ const NAV = [
 
 export default function AdminShell({ children }) {
   const path = usePathname();
-  const { user, role, isAdmin } = useShop();
+  const router = useRouter();
+  const { user, role, isAdmin, isStaff, authReady } = useShop();
   const [open, setOpen] = useState(false);
+
+  // UX guard only — the data itself is protected by Row Level Security in Supabase
+  useEffect(() => {
+    if (!authReady) return;
+    if (!user) router.replace(`/login?next=${encodeURIComponent(path)}`);
+    else if (!isStaff) router.replace('/account');
+  }, [authReady, user, isStaff, path, router]);
+  if (!authReady || !isStaff) {
+    return <div className="flex min-h-screen items-center justify-center text-ink-soft">กำลังตรวจสอบสิทธิ์…</div>;
+  }
   const items = NAV.filter((n) => !n.admin || isAdmin);
   const active = (h) => (h === '/admin' ? path === '/admin' : path.startsWith(h));
   const nav = (

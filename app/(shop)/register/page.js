@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useShop } from '@/components/Providers';
 import { getSupabase } from '@/lib/supabase/client';
 import { errMsg } from '@/lib/format';
+import { withBase } from '@/lib/base';
 
 export default function RegisterPage() {
   const { t } = useShop();
@@ -14,10 +15,10 @@ export default function RegisterPage() {
     setState({ busy: true });
     const { data, error } = await getSupabase().auth.signUp({
       email: f.email.trim(), password: f.password,
-      options: { data: { full_name: f.name }, emailRedirectTo: `${window.location.origin}/login` },
+      options: { data: { full_name: f.name }, emailRedirectTo: `${window.location.origin}${withBase('/login/')}` },
     });
     if (error) setState({ error: errMsg(error) });
-    else if (data.session) window.location.href = '/account';
+    else if (data.session) window.location.href = withBase('/account/');
     else setState({ ok: true });
   }
   return (

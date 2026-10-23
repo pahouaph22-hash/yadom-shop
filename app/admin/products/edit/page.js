@@ -1,7 +1,8 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useShop } from '@/components/Providers';
 import { PageHead, Alert, Modal, useLoad } from '@/components/admin/ui';
@@ -14,7 +15,7 @@ const EMPTY = {
 };
 const REASON_TH = { initial: 'สต็อกเริ่มต้น', restock: 'รับสินค้าเข้า', adjust: 'ปรับยอด (ตรวจนับ)', damage: 'เสียหาย/สูญหาย', order: 'ขาย', order_edit: 'แก้ไขคำสั่งซื้อ', cancel: 'ยกเลิกคำสั่งซื้อ', return: 'รับคืนสินค้า' };
 
-export default function ProductEdit({ params }) {
+function ProductEdit({ params }) {
   const isNew = params.id === 'new';
   const router = useRouter();
   const { isAdmin } = useShop();
@@ -75,7 +76,7 @@ export default function ProductEdit({ params }) {
     if (res.error) {
       return setMsg({ error: res.error.code === '23505' ? 'SKU นี้มีอยู่แล้ว — ใช้รหัสอื่น' : errMsg(res.error) });
     }
-    if (isNew) router.replace(`/admin/products/${res.data.id}`);
+    if (isNew) router.replace(`/admin/products/edit?id=${res.data.id}`);
     else { setMsg({ ok: 'บันทึกแล้ว — การเปลี่ยนแปลงถูกบันทึกในประวัติ' }); load(); }
   }
 
@@ -169,7 +170,7 @@ export default function ProductEdit({ params }) {
                   <td className="text-xs">{dt(m.created_at)}</td><td>{REASON_TH[m.reason]}</td>
                   <td className={`text-right font-semibold ${m.change < 0 ? 'text-red-700' : 'text-jade'}`}>{m.change > 0 ? '+' : ''}{m.change}</td>
                   <td className="text-right">{m.stock_after}</td>
-                  <td className="text-xs">{m.order_id ? <Link className="text-jade hover:underline" href={`/admin/orders/${m.order_id}`}>{m.note}</Link> : m.note}</td>
+                  <td className="text-xs">{m.order_id ? <Link className="text-jade hover:underline" href={`/admin/orders/view?id=${m.order_id}`}>{m.note}</Link> : m.note}</td>
                 </tr>
               ))}
             </tbody>
@@ -219,4 +220,15 @@ function StockModal({ p, isAdmin, onClose, onDone }) {
       </form>
     </Modal>
   );
+}
+
+
+function WithQuery() {
+  const sp = useSearchParams();
+  const id = sp.get('id') || '';
+  return <ProductEdit key={id} params={{ id }} />;
+}
+
+export default function Page() {
+  return <Suspense fallback={<p className="text-ink-soft">กำลังโหลด…</p>}><WithQuery /></Suspense>;
 }
