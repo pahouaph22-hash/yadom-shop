@@ -79,6 +79,17 @@ function CustomerPage({ params }) {
             <p className="font-semibold">บัญชีสมาชิก: {acct.email}</p>
             <p className="text-xs text-ink-soft">สมัครเมื่อ {dt(acct.created_at)} · {acct.confirmed ? 'ยืนยันอีเมลแล้ว' : 'ยังไม่ยืนยันอีเมล'} · เข้าระบบล่าสุด {acct.last_sign_in_at ? dt(acct.last_sign_in_at) : 'ยังไม่เคย'}</p>
             {!acct.is_active && <p className="mt-1 font-semibold text-red-700">บัญชีถูกปิดใช้งาน — สั่งซื้อไม่ได้</p>}
+            <p className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+              <span className={`rounded-full px-2 py-0.5 font-semibold ${stats?.email_verified_at ? 'bg-jade-mist text-jade' : 'bg-saffron-pale text-saffron-deep'}`}>อีเมล: {stats?.email_verified_at ? 'ยืนยันแล้ว' : 'ยังไม่ยืนยัน'}</span>
+              <span className={`rounded-full px-2 py-0.5 font-semibold ${stats?.phone_verified_at ? 'bg-jade-mist text-jade' : 'bg-saffron-pale text-saffron-deep'}`}>เบอร์โทร: {stats?.phone_verified_at ? `ยืนยันแล้ว ${dt(stats.phone_verified_at)}` : 'ยังไม่ยืนยัน'}</span>
+              <button className="btn-ghost btn-sm" onClick={async () => {
+                const v = !stats?.phone_verified_at;
+                if (v && !window.confirm(`ยืนยันว่าได้โทร/ทัก WhatsApp เบอร์ ${stats?.phone} แล้ว และเป็นเจ้าของบัญชีจริง?`)) return;
+                const { error } = await getSupabase().rpc('set_phone_verified', { p_customer_id: params.id, p_verified: v });
+                if (error) setMsg({ error: errMsg(error) }); else load();
+              }}>{stats?.phone_verified_at ? 'ยกเลิกการยืนยันเบอร์' : 'ยืนยันเบอร์โทรแล้ว'}</button>
+              {stats?.phone && <a className="btn-ghost btn-sm" target="_blank" rel="noopener noreferrer" href={`https://wa.me/${String(stats.phone).replace(/\D/g, '').replace(/^0/, '856')}`}>เปิด WhatsApp</a>}
+            </p>
           </div>
           {isAdmin && (
             <button className={acct.is_active ? 'btn-danger btn-sm' : 'btn-primary btn-sm'} onClick={async () => {

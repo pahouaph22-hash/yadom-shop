@@ -57,7 +57,8 @@ export default function CustomersPage() {
               {list.map((c) => (
                 <tr key={c.id}>
                   <td><Link href={`/admin/customers/edit?id=${c.id}`} className="font-semibold text-jade hover:underline">{c.name}</Link><div className="text-xs text-ink-faint">{c.phone}{c.province ? ` · ${c.province}` : ''}</div></td>
-                  <td className="text-xs">{c.user_id ? <span className="rounded bg-jade-mist px-1.5 py-0.5 text-jade">สมาชิก · {d(c.member_since)}</span> : '—'}</td>
+                  <td className="text-xs">{c.user_id ? <span className="rounded bg-jade-mist px-1.5 py-0.5 text-jade">สมาชิก · {d(c.member_since)}</span> : '—'}
+                    {c.user_id && <div className="mt-1 text-ink-faint">{c.email_verified_at ? '✓อีเมล' : '✗อีเมล'} · {c.phone_verified_at ? '✓เบอร์' : '✗เบอร์'}</div>}</td>
                   <td className="text-xs">{CTYPE_TH[c.type]}</td>
                   <td className="text-right">{c.orders_count}</td>
                   <td className="text-right font-semibold">{kip(c.total_spent)}</td>
