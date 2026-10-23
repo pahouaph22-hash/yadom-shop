@@ -20,7 +20,7 @@ function LoginForm() {
     setBusy(true); setError('');
     const sb = getSupabase();
     const { error: err } = await sb.auth.signInWithPassword({ email: email.trim(), password });
-    if (err) { setBusy(false); setError(errMsg(err)); return; }
+    if (err) { setBusy(false); setError(/confirm/i.test(err.message) ? t('emailNotConfirmed') : errMsg(err)); return; }
     const { data: staff } = await sb.rpc('is_staff');
     if (staff) {
       // Staff accounts sign in on the staff page only

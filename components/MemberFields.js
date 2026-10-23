@@ -37,7 +37,7 @@ export default function MemberFields({ f, set, withPhone = true }) {
             <select className="input" value={f.gender} onChange={set('gender')}>
               <option value="">—</option><option value="female">{t('female')}</option><option value="male">{t('male')}</option><option value="other">{t('otherGender')}</option>
             </select></label>
-          <label className="block"><span className="label">{t('birthDate')}{opt}</span><input type="date" className="input" value={f.birth_date} onChange={set('birth_date')} /></label>
+          <label className="block"><span className="label">{t('birthDate')}{opt}</span><input type="date" min="1920-01-01" max={new Date().toISOString().slice(0, 10)} className="input" value={f.birth_date} onChange={set('birth_date')} /></label>
         </div>
         <label className="block"><span className="label">{t('referral')}{opt}</span>
           <select className="input" value={f.referral_source} onChange={set('referral_source')}>
