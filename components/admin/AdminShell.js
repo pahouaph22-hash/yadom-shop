@@ -34,7 +34,8 @@ export default function AdminShell({ children }) {
     return <div className="flex min-h-screen items-center justify-center text-ink-soft">กำลังตรวจสอบสิทธิ์…</div>;
   }
   const items = NAV.filter((n) => !n.admin || isAdmin);
-  const active = (h) => (h === '/admin' ? path === '/admin' : path.startsWith(h));
+  const p = path.replace(/\/$/, '') || '/';
+  const active = (h) => (h === '/admin' ? p === '/admin' : p.startsWith(h));
   const nav = (
     <nav className="flex flex-col gap-0.5">
       {items.map((n) => (
