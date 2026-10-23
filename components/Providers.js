@@ -22,6 +22,7 @@ export default function Providers({ children, initialSettings = {}, initialChann
   const [channels, setChannels] = useState(initialChannels);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
+  const [perms, setPerms] = useState([]);
   const [ready, setReady] = useState(false);
   const [authReady, setAuthReady] = useState(false);
 
@@ -50,12 +51,14 @@ export default function Providers({ children, initialSettings = {}, initialChann
     const apply = async (session) => {
       // resolve the role before publishing the user, so guards never see "signed in but no role yet"
       let r = null;
+      let p = [];
       if (session?.user) {
-        const { data } = await sb.rpc('my_role');
-        r = data;
+        const { data } = await sb.from('profiles').select('role, permissions, is_active').eq('id', session.user.id).maybeSingle();
+        if (data) { r = data.is_active ? data.role : 'inactive'; p = data.permissions || []; }
       }
       setUser(session?.user ?? null);
       setRole(r);
+      setPerms(p);
       setAuthReady(true);
     };
     // Supabase holds an auth lock while it runs this callback; calling another Supabase
@@ -74,6 +77,9 @@ export default function Providers({ children, initialSettings = {}, initialChann
       lang, currency, cart, settings, channels, user, role, ready, authReady, rate,
       isStaff: role === 'admin' || role === 'staff',
       isAdmin: role === 'admin',
+      isCustomer: role === 'customer',
+      perms,
+      can: (perm) => role === 'admin' || (role === 'staff' && perms.includes(perm)),
       t: (k, v) => translate(lang, k, v),
       fmt: (lak) => money(lak, currency, rate),
       setLang: (l) => { setLangState(l); store('yd_lang', l); },
@@ -93,7 +99,7 @@ export default function Providers({ children, initialSettings = {}, initialChann
       removeFromCart: (id) => setCart((c) => c.filter((x) => x.id !== id)),
       clearCart: () => setCart([]),
     };
-  }, [lang, currency, cart, settings, channels, user, role, ready, authReady, refreshSettings]);
+  }, [lang, currency, cart, settings, channels, user, role, perms, ready, authReady, refreshSettings]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

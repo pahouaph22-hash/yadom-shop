@@ -12,7 +12,9 @@ function CustomerPage({ params }) {
   const isNew = params.id === 'new';
   const router = useRouter();
   const { isAdmin } = useShop();
-  const [f, setF] = useState(isNew ? { name: '', phone: '', email: '', address: '', province: '', type: 'retail', note: '' } : null);
+  const EXTRA = { district: '', village: '', gender: '', birth_date: '', whatsapp: '', facebook: '', referral_source: '', marketing_ok: false };
+  const [f, setF] = useState(isNew ? { name: '', phone: '', email: '', address: '', province: '', type: 'retail', note: '', ...EXTRA } : null);
+  const [acct, setAcct] = useState(null);
   const [stats, setStats] = useState(null);
   const [msg, setMsg] = useState({});
   const [orders] = useLoad((sb) => (isNew ? Promise.resolve({ data: [] }) : sb.from('orders').select('id,order_no,status,total,paid_amount,refunded_amount,created_at,channel').eq('customer_id', params.id).order('created_at', { ascending: false })), [params.id]);
@@ -21,16 +23,28 @@ function CustomerPage({ params }) {
     const { data, error } = await getSupabase().from('customer_stats').select('*').eq('id', params.id).single();
     if (error) return setMsg({ error: errMsg(error) });
     setStats(data);
-    setF({ name: data.name, phone: data.phone, email: data.email || '', address: data.address || '', province: data.province || '', type: data.type, note: data.note || '' });
+    setF({ name: data.name, phone: data.phone, email: data.email || '', address: data.address || '', province: data.province || '', type: data.type, note: data.note || '',
+      district: data.district || '', village: data.village || '', gender: data.gender || '', birth_date: data.birth_date || '', whatsapp: data.whatsapp || '',
+      facebook: data.facebook || '', referral_source: data.referral_source || '', marketing_ok: !!data.marketing_ok });
+    if (data.user_id) {
+      const sb = getSupabase();
+      const [{ data: a }, { data: prof }] = await Promise.all([
+        sb.rpc('member_accounts', { p_user_ids: [data.user_id] }),
+        sb.from('profiles').select('is_active').eq('id', data.user_id).maybeSingle(),
+      ]);
+      setAcct({ ...(a?.[0] || {}), user_id: data.user_id, is_active: prof?.is_active ?? true });
+    } else setAcct(null);
   }
   useEffect(() => { if (!isNew) load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [params.id]);
   if (!f) return msg.error ? <Alert error={msg.error} /> : <p className="text-ink-soft">กำลังโหลด…</p>;
-  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
 
   async function save(e) {
     e.preventDefault();
     setMsg({});
-    const row = { ...f, email: f.email || null, address: f.address || null, province: f.province || null, note: f.note || null };
+    const row = { ...f, email: f.email || null, address: f.address || null, province: f.province || null, note: f.note || null,
+      district: f.district || null, village: f.village || null, gender: f.gender || null, birth_date: f.birth_date || null,
+      whatsapp: f.whatsapp || null, facebook: f.facebook || null, referral_source: f.referral_source || null };
     const sb = getSupabase();
     const res = isNew ? await sb.from('customers').insert(row).select('id').single() : await sb.from('customers').update(row).eq('id', params.id).select('id').single();
     if (res.error) return setMsg({ error: res.error.code === '23505' ? 'เบอร์โทรนี้มีลูกค้าอยู่แล้ว' : errMsg(res.error) });
@@ -59,13 +73,42 @@ function CustomerPage({ params }) {
           <Stat label="สั่งซื้อล่าสุด" value={stats.last_order_at ? dt(stats.last_order_at).split(',')[0] : '—'} tone="ink" />
         </div>
       )}
+      {acct && (
+        <section className="card mb-6 flex flex-wrap items-center justify-between gap-3 border-l-4 border-jade p-4 text-sm">
+          <div>
+            <p className="font-semibold">บัญชีสมาชิก: {acct.email}</p>
+            <p className="text-xs text-ink-soft">สมัครเมื่อ {dt(acct.created_at)} · {acct.confirmed ? 'ยืนยันอีเมลแล้ว' : 'ยังไม่ยืนยันอีเมล'} · เข้าระบบล่าสุด {acct.last_sign_in_at ? dt(acct.last_sign_in_at) : 'ยังไม่เคย'}</p>
+            {!acct.is_active && <p className="mt-1 font-semibold text-red-700">บัญชีถูกปิดใช้งาน — สั่งซื้อไม่ได้</p>}
+          </div>
+          {isAdmin && (
+            <button className={acct.is_active ? 'btn-danger btn-sm' : 'btn-primary btn-sm'} onClick={async () => {
+              if (!window.confirm(acct.is_active ? 'ปิดใช้งานบัญชีสมาชิกนี้? ลูกค้าจะสั่งซื้อไม่ได้จนกว่าจะเปิดใหม่' : 'เปิดใช้งานบัญชีนี้อีกครั้ง?')) return;
+              const { error } = await getSupabase().from('profiles').update({ is_active: !acct.is_active }).eq('id', acct.user_id);
+              if (error) setMsg({ error: errMsg(error) }); else load();
+            }}>{acct.is_active ? 'ปิดใช้งานบัญชี' : 'เปิดใช้งานบัญชี'}</button>
+          )}
+        </section>
+      )}
+      {stats && !stats.user_id && <p className="mb-6 rounded-lg bg-jade-wash p-3 text-sm text-ink-soft">ลูกค้ารายนี้ยังไม่ได้สมัครสมาชิก (บันทึกจากหน้าร้าน/คำสั่งซื้อเก่า) — ถ้าสมัครด้วยเบอร์เดียวกัน ระบบจะผูกประวัติให้อัตโนมัติ</p>}
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
         <form onSubmit={save} className="card h-fit space-y-3 p-4">
           <label className="block"><span className="label">ชื่อ *</span><input required className="input" value={f.name} onChange={set('name')} /></label>
           <label className="block"><span className="label">เบอร์โทร *</span><input required className="input" value={f.phone} onChange={set('phone')} /></label>
           <label className="block"><span className="label">อีเมล</span><input type="email" className="input" value={f.email} onChange={set('email')} /></label>
           <label className="block"><span className="label">ที่อยู่จัดส่ง</span><textarea rows={2} className="input" value={f.address} onChange={set('address')} /></label>
-          <label className="block"><span className="label">แขวง</span><input className="input" value={f.province} onChange={set('province')} /></label>
+          <div className="grid grid-cols-3 gap-2">
+            <label className="block"><span className="label">บ้าน</span><input className="input" value={f.village} onChange={set('village')} /></label>
+            <label className="block"><span className="label">เมือง</span><input className="input" value={f.district} onChange={set('district')} /></label>
+            <label className="block"><span className="label">แขวง</span><input className="input" value={f.province} onChange={set('province')} /></label>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block"><span className="label">WhatsApp</span><input className="input" value={f.whatsapp} onChange={set('whatsapp')} /></label>
+            <label className="block"><span className="label">Facebook</span><input className="input" value={f.facebook} onChange={set('facebook')} /></label>
+            <label className="block"><span className="label">เพศ</span><select className="input" value={f.gender} onChange={set('gender')}><option value="">—</option><option value="female">หญิง</option><option value="male">ชาย</option><option value="other">อื่น ๆ</option></select></label>
+            <label className="block"><span className="label">วันเกิด</span><input type="date" className="input" value={f.birth_date} onChange={set('birth_date')} /></label>
+          </div>
+          <label className="block"><span className="label">รู้จักร้านจาก</span><input className="input" value={f.referral_source} onChange={set('referral_source')} /></label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!f.marketing_ok} onChange={set('marketing_ok')} /> ยินยอมรับข่าวสาร/โปรโมชัน</label>
           <label className="block"><span className="label">ประเภทลูกค้า</span>
             <select className="input" value={f.type} onChange={set('type')}>{Object.entries(CTYPE_TH).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
           </label>

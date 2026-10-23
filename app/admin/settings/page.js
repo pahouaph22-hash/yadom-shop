@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useShop } from '@/components/Providers';
@@ -18,9 +19,7 @@ export default function SettingsPage() {
   const [msg, setMsg] = useState({});
   const [s, setS] = useState(null);
   const [channels, reloadCh] = useLoad((sb) => sb.from('contact_channels').select('*').order('sort'), []);
-  const [users, reloadUsers] = useLoad((sb) => sb.from('profiles').select('*').in('role', ['admin', 'staff']).order('created_at'), []);
   const [edit, setEdit] = useState(null);
-  const [roleForm, setRoleForm] = useState({ email: '', role: 'staff' });
 
   async function loadSettings() {
     const { data, error } = await getSupabase().from('settings').select('*');
@@ -50,18 +49,6 @@ export default function SettingsPage() {
     const { error } = await getSupabase().from('contact_channels').delete().eq('id', c.id);
     if (error) setMsg({ error: errMsg(error) }); else { reloadCh(); refreshSettings(); }
   }
-  async function setRole(e) {
-    e.preventDefault();
-    const { error } = await getSupabase().rpc('set_user_role', { p_email: roleForm.email, p_role: roleForm.role });
-    if (error) return setMsg({ error: errMsg(error) });
-    setMsg({ ok: `กำหนดสิทธิ์ ${roleForm.email} แล้ว` }); setRoleForm({ email: '', role: 'staff' }); reloadUsers();
-  }
-  async function revoke(u) {
-    if (!window.confirm(`ถอนสิทธิ์ ${u.email} ให้เป็นลูกค้าทั่วไป?`)) return;
-    const { error } = await getSupabase().rpc('set_user_role', { p_email: u.email, p_role: 'customer' });
-    if (error) setMsg({ error: errMsg(error) }); else reloadUsers();
-  }
-
   return (
     <>
       <PageHead title="ช่องทางติดต่อและตั้งค่า" />
@@ -107,25 +94,9 @@ export default function SettingsPage() {
         </form>
       )}
 
-      <section className="card p-4">
+      <section className="card p-4 text-sm">
         <h2 className="mb-1 font-semibold">ผู้ดูแลระบบและพนักงาน</h2>
-        <p className="mb-3 text-sm text-ink-soft">ให้พนักงานสมัครสมาชิกที่หน้า /register ก่อน แล้วกำหนดสิทธิ์ด้วยอีเมล · พนักงานจัดการคำสั่งซื้อ สินค้า ลูกค้าได้ แต่ไม่เห็นค่าใช้จ่าย กำไร ประวัติการดำเนินงาน และคืนเงินไม่ได้</p>
-        <table className="tbl mb-4">
-          <thead><tr><th>อีเมล</th><th>ชื่อ</th><th>สิทธิ์</th><th>ตั้งแต่</th><th></th></tr></thead>
-          <tbody>
-            {(users || []).map((u) => (
-              <tr key={u.id}><td>{u.email}</td><td>{u.full_name}</td><td>{u.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน'}</td><td className="text-xs">{dt(u.created_at)}</td>
-                <td className="text-right"><button className="btn-danger btn-sm" onClick={() => revoke(u)}>ถอนสิทธิ์</button></td></tr>
-            ))}
-          </tbody>
-        </table>
-        <form onSubmit={setRole} className="flex flex-wrap gap-2">
-          <input required type="email" className="input max-w-xs" placeholder="อีเมลผู้ใช้" value={roleForm.email} onChange={(e) => setRoleForm({ ...roleForm, email: e.target.value })} />
-          <select className="input w-auto" value={roleForm.role} onChange={(e) => setRoleForm({ ...roleForm, role: e.target.value })}>
-            <option value="staff">พนักงาน</option><option value="admin">ผู้ดูแลระบบ</option>
-          </select>
-          <button className="btn-primary">กำหนดสิทธิ์</button>
-        </form>
+        <p className="text-ink-soft">จัดการบัญชีพนักงานและสิทธิ์ได้ที่เมนู <Link href="/admin/staff" className="font-semibold text-jade underline">พนักงานและสิทธิ์</Link></p>
       </section>
 
       {edit && (

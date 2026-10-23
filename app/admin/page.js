@@ -8,7 +8,9 @@ const ENTITY_TH = { products: 'สินค้า', orders: 'คำสั่ง�
 const ACTION_TH = { insert: 'เพิ่ม', update: 'แก้ไข', delete: 'ลบ', login: 'เข้าสู่ระบบ', logout: 'ออกจากระบบ' };
 
 export default function Dashboard() {
-  const { isAdmin } = useShop();
+  const { can } = useShop();
+  const isAdmin = can('finance');
+  const canAudit = can('audit');
   const [d, reload, error] = useLoad((sb) => sb.rpc('dashboard_stats'));
   const [slips] = useLoad((sb) => sb.from('payment_slips').select('id, order_id, created_at, orders(order_no)').eq('status', 'pending').order('created_at'), []);
   if (error) return <Alert error={error} />;
@@ -89,7 +91,7 @@ export default function Dashboard() {
               ))}
             </ul>
           )}
-          {isAdmin && (
+          {canAudit && (
             <>
               <div className="mb-3 mt-6 flex items-center justify-between">
                 <h2 className="font-semibold">กิจกรรมล่าสุด</h2>

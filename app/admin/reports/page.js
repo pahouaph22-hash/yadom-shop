@@ -15,7 +15,8 @@ function periodRange(p, grain) {
 }
 
 export default function ReportsPage() {
-  const { isAdmin } = useShop();
+  const { can } = useShop();
+  const isAdmin = can('finance');
   const today = todayLocal();
   const [from, setFrom] = useState(today.slice(0, 8) + '01');
   const [to, setTo] = useState(today);

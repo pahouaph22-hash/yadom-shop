@@ -5,35 +5,40 @@ import { useEffect, useState } from 'react';
 import { useShop } from '@/components/Providers';
 import { logout } from '@/lib/logout';
 
-const NAV = [
+// perm: required permission (admins have all). adminOnly: admins only.
+export const NAV = [
   { href: '/admin', label: 'ภาพรวม' },
-  { href: '/admin/orders', label: 'คำสั่งซื้อ' },
-  { href: '/admin/products', label: 'สินค้าและสต็อก' },
-  { href: '/admin/customers', label: 'ลูกค้า' },
-  { href: '/admin/messages', label: 'ข้อความลูกค้า' },
-  { href: '/admin/reports', label: 'รายงานยอดขาย' },
-  { href: '/admin/expenses', label: 'ค่าใช้จ่าย', admin: true },
-  { href: '/admin/settings', label: 'ช่องทางติดต่อและตั้งค่า', admin: true },
-  { href: '/admin/audit', label: 'ประวัติการดำเนินงาน', admin: true },
-  { href: '/admin/backup', label: 'สำรองข้อมูล', admin: true },
+  { href: '/admin/orders', label: 'คำสั่งซื้อ', perm: 'orders' },
+  { href: '/admin/products', label: 'สินค้าและสต็อก', perm: 'products' },
+  { href: '/admin/customers', label: 'สมาชิก / ลูกค้า', perm: 'customers' },
+  { href: '/admin/messages', label: 'ข้อความลูกค้า', perm: 'messages' },
+  { href: '/admin/reports', label: 'รายงานยอดขาย', perm: 'reports' },
+  { href: '/admin/expenses', label: 'ค่าใช้จ่าย', perm: 'finance' },
+  { href: '/admin/settings', label: 'ช่องทางติดต่อและตั้งค่า', perm: 'settings' },
+  { href: '/admin/staff', label: 'พนักงานและสิทธิ์', adminOnly: true },
+  { href: '/admin/audit', label: 'ประวัติการดำเนินงาน', perm: 'audit' },
+  { href: '/admin/backup', label: 'สำรองข้อมูล', adminOnly: true },
 ];
 
 export default function AdminShell({ children }) {
   const path = usePathname();
   const router = useRouter();
-  const { user, role, isAdmin, isStaff, authReady } = useShop();
+  const { user, role, isAdmin, isStaff, authReady, can } = useShop();
   const [open, setOpen] = useState(false);
 
   // UX guard only — the data itself is protected by Row Level Security in Supabase
   useEffect(() => {
     if (!authReady) return;
-    if (!user) router.replace(`/login?next=${encodeURIComponent(path)}`);
-    else if (!isStaff) router.replace('/account');
+    if (!user || !isStaff) router.replace(`/staff/login?next=${encodeURIComponent(path)}`);
   }, [authReady, user, isStaff, path, router]);
   if (!authReady || !isStaff) {
     return <AuthWait />;
   }
-  const items = NAV.filter((n) => !n.admin || isAdmin);
+  const allowed = (n) => (n.adminOnly ? isAdmin : !n.perm || can(n.perm));
+  const items = NAV.filter(allowed);
+  const cur = path.replace(/\/$/, '') || '/';
+  const section = [...NAV].sort((a, b) => b.href.length - a.href.length).find((n) => cur === n.href || cur.startsWith(n.href + '/'));
+  const pageAllowed = !section || allowed(section);
   const p = path.replace(/\/$/, '') || '/';
   const active = (h) => (h === '/admin' ? p === '/admin' : p.startsWith(h));
   const nav = (
@@ -54,7 +59,7 @@ export default function AdminShell({ children }) {
         {nav}
         <div className="mt-auto space-y-2 pt-6 text-xs text-jade-mist">
           <p className="truncate">{user?.email}</p>
-          <p>สิทธิ์: {role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน'}</p>
+          <p>สิทธิ์: {role === 'admin' ? 'ผู้ดูแลระบบ (ทั้งหมด)' : 'พนักงาน'}</p>
           <div className="flex gap-2">
             <Link href="/" className="rounded border border-white/20 px-2 py-1 hover:bg-white/10">ดูหน้าร้าน</Link>
             <button onClick={logout} className="rounded border border-white/20 px-2 py-1 hover:bg-white/10">ออกจากระบบ</button>
@@ -67,7 +72,13 @@ export default function AdminShell({ children }) {
           <span className="font-display font-bold">ຢາດົມຫອມລາວ · จัดการร้าน</span>
         </header>
         {open && <div className="bg-jade-deep p-3 lg:hidden">{nav}<button onClick={logout} className="mt-2 px-3 text-sm text-jade-mist">ออกจากระบบ</button></div>}
-        <main className="mx-auto max-w-7xl p-4 md:p-6">{children}</main>
+        <main className="mx-auto max-w-7xl p-4 md:p-6">{pageAllowed ? children : (
+          <div className="card mx-auto mt-10 max-w-md p-6 text-center">
+            <p className="font-semibold">คุณไม่มีสิทธิ์เข้าหน้านี้</p>
+            <p className="mt-1 text-sm text-ink-soft">ติดต่อแอดมินเพื่อขอสิทธิ์ที่จำเป็นสำหรับงานของคุณ</p>
+            <Link href="/admin" className="btn-primary mt-4">กลับหน้าภาพรวม</Link>
+          </div>
+        )}</main>
       </div>
     </div>
   );

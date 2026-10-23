@@ -46,7 +46,6 @@ export function Header() {
         </nav>
         <div className="ml-auto hidden md:block"><LangCurrency /></div>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          {isStaff && <Link href="/admin" className="btn-ghost btn-sm hidden sm:inline-flex">{t('admin')}</Link>}
           <Link href={user ? '/account' : '/login'} className="hidden text-sm font-medium text-ink-soft hover:text-jade sm:block">
             {user ? t('account') : t('login')}
           </Link>
@@ -61,7 +60,6 @@ export function Header() {
           <nav className="mb-3 flex flex-col gap-2 text-sm font-medium">
             {links.map((l) => <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</Link>)}
             <Link href={user ? '/account' : '/login'} onClick={() => setOpen(false)}>{user ? t('account') : t('login')}</Link>
-            {isStaff && <Link href="/admin">{t('admin')}</Link>}
           </nav>
           <LangCurrency />
         </div>

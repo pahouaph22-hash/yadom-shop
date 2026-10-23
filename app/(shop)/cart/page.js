@@ -6,6 +6,7 @@ import { useShop, linePrice } from '@/components/Providers';
 import { getSupabase } from '@/lib/supabase/client';
 import { productName, errMsg, pickLang } from '@/lib/format';
 import { PAY_METHODS } from '@/lib/i18n';
+import { fullAddress } from '@/components/MemberFields';
 
 function getKey(cart) {
   const sig = cart.map((x) => `${x.id}:${x.qty}`).join('|');
@@ -19,16 +20,23 @@ function getKey(cart) {
 }
 
 export default function CartPage() {
-  const { t, lang, fmt, cart, setQty, removeFromCart, clearCart, settings, currency } = useShop();
+  const { t, lang, fmt, cart, setQty, removeFromCart, clearCart, settings, currency, user, authReady, role } = useShop();
   const router = useRouter();
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', province: '', payment_method: 'bank_transfer' });
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
+  const [member, setMember] = useState(null);
   useEffect(() => {
-    try { const s = JSON.parse(localStorage.getItem('yd_buyer') || 'null'); if (s) setForm((f) => ({ ...f, ...s })); } catch { /* ignore */ }
-  }, []);
+    if (!user) return;
+    getSupabase().from('customers').select('*').eq('user_id', user.id).maybeSingle().then(({ data }) => {
+      if (!data) return;
+      setMember(data);
+      setForm((f) => ({ ...f, name: data.name || '', phone: data.phone || '', email: data.email || user.email || '',
+        address: fullAddress(data), province: data.province || '' }));
+    });
+  }, [user]);
 
   const lines = cart.map((x) => ({ ...x, ...linePrice(x) }));
   const subtotal = lines.reduce((s, x) => s + x.unit * x.qty, 0);
@@ -49,10 +57,7 @@ export default function CartPage() {
     });
     setBusy(false);
     if (err) { setError(errMsg(err)); return; }
-    try {
-      localStorage.setItem('yd_buyer', JSON.stringify({ name: form.name, phone: form.phone, email: form.email, address: form.address, province: form.province }));
-      sessionStorage.removeItem('yd_checkout');
-    } catch { /* ignore */ }
+    try { sessionStorage.removeItem('yd_checkout'); } catch { /* ignore */ }
     clearCart();
     router.push(`/order?no=${encodeURIComponent(data.order_no)}&phone=${encodeURIComponent(form.phone)}&new=1`);
   }
@@ -99,8 +104,21 @@ export default function CartPage() {
         {currency === 'THB' && <p className="mt-1 text-xs text-ink-faint">{t('thbNote')}</p>}
       </section>
 
+      {!authReady ? <div className="card h-fit p-5 text-ink-soft">…</div> : !user ? (
+        <div className="card h-fit space-y-4 border-2 border-saffron p-5">
+          <h2 className="font-display text-xl font-bold">🔒 {t('memberOnly')}</h2>
+          <p className="text-sm text-ink-soft">{t('memberOnlyHint')}</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Link href="/login?next=/cart" className="btn-primary">{t('login')}</Link>
+            <Link href="/register" className="btn-gold">{t('register')}</Link>
+          </div>
+        </div>
+      ) : role === 'inactive' ? (
+        <p className="card h-fit p-5 text-red-700">{t('accountInactive')}</p>
+      ) : (
       <form onSubmit={submit} className="card h-fit space-y-4 p-5">
         <h2 className="font-display text-xl font-bold">{t('yourDetails')}</h2>
+        {member && <p className="rounded-lg bg-jade-wash p-2 text-xs text-ink-soft">✓ {t('myProfile')} — {t('shipToOther')}</p>}
         <label className="block"><span className="label">{t('name')} *</span><input required maxLength={120} className="input" value={form.name} onChange={set('name')} autoComplete="name" /></label>
         <label className="block"><span className="label">{t('phone')} * (WhatsApp)</span><input required inputMode="tel" maxLength={30} className="input" value={form.phone} onChange={set('phone')} autoComplete="tel" placeholder="020 xxxx xxxx" /></label>
         <label className="block"><span className="label">{t('address')} *</span><textarea required minLength={5} maxLength={400} rows={3} className="input" value={form.address} onChange={set('address')} autoComplete="street-address" /></label>
@@ -118,6 +136,7 @@ export default function CartPage() {
         {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
         <button disabled={busy} className="btn-gold w-full py-3 text-base">{busy ? t('placing') : `${t('placeOrder')} · ${fmt(subtotal)}`}</button>
       </form>
+      )}
     </div>
   );
 }

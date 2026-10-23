@@ -21,7 +21,8 @@ const EVENT_TH = { created: 'สร้างคำสั่งซื้อ', sta
 
 function OrderDetail({ params }) {
   const id = params.id;
-  const { isAdmin } = useShop();
+  const { isAdmin, can } = useShop();
+  const showCost = can('finance');
   const [data, reload, loadErr] = useLoad(async (sb) => {
     const [o, items, pays, ev] = await Promise.all([
       sb.from('orders').select('*, customers(*)').eq('id', id).single(),
@@ -81,13 +82,13 @@ function OrderDetail({ params }) {
               {editableItems && <button onClick={() => { setMsg({}); setModal('items'); }} className="btn-ghost btn-sm no-print">แก้ไขรายการ</button>}
             </div>
             <table className="tbl">
-              <thead><tr><th>สินค้า</th><th className="text-right">จำนวน</th><th className="text-right">ราคา/หน่วย</th><th className="text-right">รวม</th><th className="text-right no-print">ต้นทุน/หน่วย</th></tr></thead>
+              <thead><tr><th>สินค้า</th><th className="text-right">จำนวน</th><th className="text-right">ราคา/หน่วย</th><th className="text-right">รวม</th>{showCost && <th className="text-right no-print">ต้นทุน/หน่วย</th>}</tr></thead>
               <tbody>
                 {items.map((i) => (
                   <tr key={i.id}>
                     <td>{i.product_name} <span className="text-xs text-ink-faint">{i.sku}</span>{i.is_wholesale_price && <span className="ml-1 rounded bg-saffron-pale px-1 text-xs text-saffron-deep">ราคาส่ง</span>}</td>
                     <td className="text-right">{i.qty}</td><td className="text-right">{kip(i.unit_price)}</td>
-                    <td className="text-right">{kip(i.line_total)}</td><td className="text-right text-ink-faint no-print">{kip(i.unit_cost)}</td>
+                    <td className="text-right">{kip(i.line_total)}</td>{showCost && <td className="text-right text-ink-faint no-print">{kip(i.unit_cost)}</td>}
                   </tr>
                 ))}
               </tbody>

@@ -21,9 +21,16 @@ function LoginForm() {
     const sb = getSupabase();
     const { error: err } = await sb.auth.signInWithPassword({ email: email.trim(), password });
     if (err) { setBusy(false); setError(errMsg(err)); return; }
-    await sb.rpc('log_auth_event', { p_event: 'login' });
     const { data: staff } = await sb.rpc('is_staff');
-    const dest = next.startsWith('/') && !next.startsWith('//') ? next : staff ? '/admin' : '/account';
+    if (staff) {
+      // Staff accounts sign in on the staff page only
+      await sb.auth.signOut();
+      setBusy(false);
+      setError(t('staffAccountHere'));
+      return;
+    }
+    await sb.rpc('log_auth_event', { p_event: 'login' });
+    const dest = next.startsWith('/') && !next.startsWith('//') && !next.startsWith('/admin') ? next : '/account';
     router.replace(dest);
     router.refresh();
   }

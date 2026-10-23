@@ -18,7 +18,7 @@ const REASON_TH = { initial: 'สต็อกเริ่มต้น', restock:
 function ProductEdit({ params }) {
   const isNew = params.id === 'new';
   const router = useRouter();
-  const { isAdmin } = useShop();
+  const { isAdmin, can } = useShop();
   const [f, setF] = useState(isNew ? EMPTY : null);
   const [msg, setMsg] = useState({});
   const [busy, setBusy] = useState(false);
@@ -178,7 +178,7 @@ function ProductEdit({ params }) {
         </section>
       )}
 
-      {stockModal && <StockModal p={f} isAdmin={isAdmin} onClose={() => setStockModal(false)} onDone={() => { setStockModal(false); load(); reloadMoves(); }} />}
+      {stockModal && <StockModal p={f} isAdmin={can('finance')} onClose={() => setStockModal(false)} onDone={() => { setStockModal(false); load(); reloadMoves(); }} />}
     </>
   );
 }
