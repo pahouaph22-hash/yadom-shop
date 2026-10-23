@@ -31,6 +31,12 @@ export default function SlipReview({ orderId, outstanding, onChanged }) {
     setApprove(null); setMsg({ ok: ok ? 'ยืนยันสลิปและบันทึกการชำระเงินแล้ว' : 'ปฏิเสธสลิปแล้ว — ลูกค้าจะเห็นเหตุผลในหน้าติดตามคำสั่งซื้อ' });
     load(); onChanged?.(); return true;
   }
+  async function closePaid(slip) {
+    setMsg({});
+    const { error } = await getSupabase().rpc('close_paid_slip', { p_slip_id: slip.id });
+    if (error) return setMsg({ error: errMsg(error) });
+    setMsg({ ok: 'ปิดสลิปแล้ว (ไม่บันทึกเงินซ้ำ)' }); load(); onChanged?.();
+  }
   function reject(slip) {
     const note = window.prompt('เหตุผลที่ปฏิเสธ (ลูกค้าจะเห็นข้อความนี้)', 'ยอดเงินไม่ตรง / สลิปไม่ชัด');
     if (note) review(slip, false, null, null, note);
@@ -60,7 +66,9 @@ export default function SlipReview({ orderId, outstanding, onChanged }) {
                 {s.review_note && <p className="text-xs text-ink-faint">หมายเหตุ: {s.review_note}</p>}
                 {s.status === 'pending' && (
                   <div className="mt-2 flex gap-2">
-                    <button className="btn-gold btn-sm" disabled={outstanding <= 0} onClick={() => setApprove({ slip: s, amount: Math.min(Number(s.amount || outstanding), outstanding), method: 'qr', note: '' })}>ยืนยันยอดเงิน</button>
+                    {outstanding > 0
+                      ? <button className="btn-gold btn-sm" onClick={() => setApprove({ slip: s, amount: Math.min(Number(s.amount || outstanding), outstanding), method: 'qr', note: '' })}>ยืนยันยอดเงิน</button>
+                      : <button className="btn-primary btn-sm" title="ออเดอร์นี้บันทึกการชำระครบแล้ว — ปิดสลิปโดยไม่บันทึกเงินซ้ำ" onClick={() => closePaid(s)}>✓ ปิดสลิป (ชำระครบแล้ว)</button>}
                     <button className="btn-danger btn-sm" onClick={() => reject(s)}>ปฏิเสธ</button>
                   </div>
                 )}

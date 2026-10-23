@@ -46,6 +46,9 @@ export default function PaymentBox({ order, phone, onChanged }) {
           ? <p className="text-sm text-ink-soft">{t('amountDue')} <b className="text-2xl text-jade">{fmt(due)}</b></p>
           : <p className="font-semibold text-jade">✓ {t('paidInFull')}</p>}
       </div>
+      {order.auto_cancel_at && due > 0 && !(order.slips || []).some((s) => s.status === 'pending') && (
+        <p className="rounded-lg border border-saffron bg-saffron-pale p-3 text-sm">⏰ {t('payDeadline', { date: dt(order.auto_cancel_at) })}</p>
+      )}
 
       {due > 0 && (
         qrs.length === 0 ? <p className="rounded-lg bg-saffron-pale p-3 text-sm">{t('noQr')}</p> : (

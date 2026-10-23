@@ -8,6 +8,7 @@ import { CHANNEL_TYPES, CHANNEL_LABEL, ChannelIcon, channelHref } from '@/compon
 import { errMsg, dt } from '@/lib/format';
 import QrManager from '@/components/admin/QrManager';
 import TelegramSettings from '@/components/admin/TelegramSettings';
+import AutomationSettings from '@/components/admin/AutomationSettings';
 
 const LANG3 = [['lo', 'ລາວ'], ['th', 'ไทย'], ['en', 'English']];
 const ML_KEYS = [
@@ -55,6 +56,7 @@ export default function SettingsPage() {
       <PageHead title="ช่องทางติดต่อและตั้งค่า" />
       <Alert {...msg} />
       {isAdmin && <TelegramSettings />}
+      {isAdmin && <AutomationSettings />}
       <QrManager />
 
       <section className="card mb-6 p-4">
