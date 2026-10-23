@@ -32,7 +32,7 @@ export default function TelegramSettings() {
   }
   useEffect(() => { load(); loadResults(); }, []);
 
-  const chatList = () => chats.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean);
+  const chatList = () => chats.split(/[\s,]+/).map((x) => x.trim()).filter((x) => /^-?\d{3,20}$/.test(x));
 
   async function save(e, override = {}) {
     e?.preventDefault();
@@ -105,15 +105,16 @@ export default function TelegramSettings() {
         </label>
       </div>
 
-      <form onSubmit={save} className="space-y-4 p-4">
+      <form onSubmit={save} autoComplete="off" className="space-y-4 p-4">
         <Alert {...msg} />
         <ol className="space-y-4 text-sm">
           <li>
             <p className="mb-1 font-semibold">1. สร้างบอท</p>
             <p className="mb-2 text-ink-soft">เปิด Telegram ค้นหา <a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" className="font-semibold text-jade underline">@BotFather</a> → พิมพ์ <code>/newbot</code> → ตั้งชื่อ → คัดลอก token ที่ได้มาวางด้านล่าง</p>
             <div className="flex gap-2">
-              <input className="input flex-1 font-mono text-xs" type={showToken ? 'text' : 'password'} autoComplete="off"
-                placeholder="123456789:AAH..." value={token} onChange={(e) => setToken(e.target.value)} />
+              <input className="input flex-1 font-mono text-xs" type="text" name="tg-bot-token" autoComplete="off" spellCheck={false}
+                data-lpignore="true" data-1p-ignore style={showToken ? undefined : { WebkitTextSecurity: 'disc' }}
+                placeholder="123456789:AAH..." value={token} onChange={(e) => setToken(e.target.value.trim())} />
               <button type="button" className="btn-ghost btn-sm" onClick={() => setShowToken(!showToken)}>{showToken ? 'ซ่อน' : 'แสดง'}</button>
             </div>
           </li>
@@ -121,7 +122,8 @@ export default function TelegramSettings() {
             <p className="mb-1 font-semibold">2. เลือกแชทที่จะรับแจ้งเตือน</p>
             <p className="mb-2 text-ink-soft">ส่งข้อความอะไรก็ได้ถึงบอทของคุณ (หรือเพิ่มบอทเข้ากลุ่มพนักงานแล้วพิมพ์ในกลุ่ม) แล้วกด “ค้นหาแชท”</p>
             <div className="flex flex-wrap gap-2">
-              <input className="input flex-1 font-mono text-xs" placeholder="Chat ID เช่น 123456789, -1001234567890" value={chats} onChange={(e) => setChats(e.target.value)} />
+              <input className="input flex-1 font-mono text-xs" type="text" name="tg-chat-ids" autoComplete="off" inputMode="numeric"
+                data-lpignore="true" data-1p-ignore placeholder="Chat ID เช่น 123456789, -1001234567890" value={chats} onChange={(e) => setChats(e.target.value)} />
               <button type="button" className="btn-ghost btn-sm" disabled={busy === 'find'} onClick={findChats}>{busy === 'find' ? 'กำลังค้นหา…' : '🔍 ค้นหาแชท'}</button>
             </div>
             {found?.length > 0 && (
