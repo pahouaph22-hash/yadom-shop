@@ -58,8 +58,13 @@ export default function Providers({ children, initialSettings = {}, initialChann
       setRole(r);
       setAuthReady(true);
     };
-    sb.auth.getSession().then(({ data }) => apply(data.session));
-    const { data: sub } = sb.auth.onAuthStateChange((_e, session) => apply(session));
+    // Supabase holds an auth lock while it runs this callback; calling another Supabase
+    // method (our rpc) inside it deadlocks. So hand the work off to the next tick.
+    const { data: sub } = sb.auth.onAuthStateChange((_e, session) => {
+      setTimeout(() => {
+        apply(session).catch(() => { setUser(session?.user ?? null); setRole(null); setAuthReady(true); });
+      }, 0);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
