@@ -31,7 +31,7 @@ export default function AdminShell({ children }) {
     else if (!isStaff) router.replace('/account');
   }, [authReady, user, isStaff, path, router]);
   if (!authReady || !isStaff) {
-    return <div className="flex min-h-screen items-center justify-center text-ink-soft">กำลังตรวจสอบสิทธิ์…</div>;
+    return <AuthWait />;
   }
   const items = NAV.filter((n) => !n.admin || isAdmin);
   const p = path.replace(/\/$/, '') || '/';
@@ -69,6 +69,25 @@ export default function AdminShell({ children }) {
         {open && <div className="bg-jade-deep p-3 lg:hidden">{nav}<button onClick={logout} className="mt-2 px-3 text-sm text-jade-mist">ออกจากระบบ</button></div>}
         <main className="mx-auto max-w-7xl p-4 md:p-6">{children}</main>
       </div>
+    </div>
+  );
+}
+
+function AuthWait() {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setSlow(true), 8000); return () => clearTimeout(t); }, []);
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center text-ink-soft">
+      <p>กำลังตรวจสอบสิทธิ์…</p>
+      {slow && (
+        <>
+          <p className="max-w-sm text-sm">ใช้เวลานานผิดปกติ — ลองปิดแท็บอื่นของเว็บนี้ แล้วกดโหลดใหม่ หรือออกจากระบบแล้วเข้าใหม่</p>
+          <div className="flex gap-2">
+            <button className="btn-primary" onClick={() => window.location.reload()}>โหลดใหม่</button>
+            <button className="btn-ghost" onClick={logout}>ออกจากระบบ</button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
