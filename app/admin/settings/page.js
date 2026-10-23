@@ -7,6 +7,7 @@ import { PageHead, Alert, Modal, useLoad } from '@/components/admin/ui';
 import { CHANNEL_TYPES, CHANNEL_LABEL, ChannelIcon, channelHref } from '@/components/channels';
 import { errMsg, dt } from '@/lib/format';
 import QrManager from '@/components/admin/QrManager';
+import TelegramSettings from '@/components/admin/TelegramSettings';
 
 const LANG3 = [['lo', 'ລາວ'], ['th', 'ไทย'], ['en', 'English']];
 const ML_KEYS = [
@@ -15,7 +16,7 @@ const ML_KEYS = [
 ];
 
 export default function SettingsPage() {
-  const { refreshSettings } = useShop();
+  const { refreshSettings, isAdmin } = useShop();
   const [msg, setMsg] = useState({});
   const [s, setS] = useState(null);
   const [channels, reloadCh] = useLoad((sb) => sb.from('contact_channels').select('*').order('sort'), []);
@@ -53,6 +54,7 @@ export default function SettingsPage() {
     <>
       <PageHead title="ช่องทางติดต่อและตั้งค่า" />
       <Alert {...msg} />
+      {isAdmin && <TelegramSettings />}
       <QrManager />
 
       <section className="card mb-6 p-4">
