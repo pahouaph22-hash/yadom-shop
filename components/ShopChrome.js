@@ -47,7 +47,7 @@ export function Header() {
         <div className="ml-auto hidden md:block"><LangCurrency /></div>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
           <Link href={user ? '/account' : '/login'} className="hidden text-sm font-medium text-ink-soft hover:text-jade sm:block">
-            {user ? t('account') : t('login')}
+            {!user ? t('login') : isStaff ? `🔑 ${t('staffAccount')}` : t('account')}
           </Link>
           <Link href="/cart" className="btn-primary btn-sm" aria-label={`${t('cart')} (${count})`}>
             {t('cart')} <span className="rounded-full bg-saffron px-1.5 text-ink">{count}</span>
@@ -59,7 +59,7 @@ export function Header() {
         <div className="border-t border-line px-4 py-3 md:hidden">
           <nav className="mb-3 flex flex-col gap-2 text-sm font-medium">
             {links.map((l) => <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</Link>)}
-            <Link href={user ? '/account' : '/login'} onClick={() => setOpen(false)}>{user ? t('account') : t('login')}</Link>
+            <Link href={user ? '/account' : '/login'} onClick={() => setOpen(false)}>{!user ? t('login') : isStaff ? `🔑 ${t('staffAccount')}` : t('account')}</Link>
           </nav>
           <LangCurrency />
         </div>

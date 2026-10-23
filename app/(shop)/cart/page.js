@@ -7,6 +7,7 @@ import { getSupabase } from '@/lib/supabase/client';
 import { productName, errMsg, pickLang } from '@/lib/format';
 import { PAY_METHODS } from '@/lib/i18n';
 import { fullAddress } from '@/components/MemberFields';
+import StaffSessionNotice from '@/components/StaffSessionNotice';
 
 function getKey(cart) {
   const sig = cart.map((x) => `${x.id}:${x.qty}`).join('|');
@@ -20,7 +21,7 @@ function getKey(cart) {
 }
 
 export default function CartPage() {
-  const { t, lang, fmt, cart, setQty, removeFromCart, clearCart, settings, currency, user, authReady, role } = useShop();
+  const { t, lang, fmt, cart, setQty, removeFromCart, clearCart, settings, currency, user, authReady, role, isStaff } = useShop();
   const router = useRouter();
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', province: '', payment_method: 'bank_transfer' });
   const [note, setNote] = useState('');
@@ -113,6 +114,8 @@ export default function CartPage() {
             <Link href="/register" className="btn-gold">{t('register')}</Link>
           </div>
         </div>
+      ) : isStaff ? (
+        <StaffSessionNotice next="/login" />
       ) : role === 'inactive' ? (
         <p className="card h-fit p-5 text-red-700">{t('accountInactive')}</p>
       ) : (

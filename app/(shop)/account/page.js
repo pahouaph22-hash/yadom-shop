@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useShop } from '@/components/Providers';
 import MemberFields, { EMPTY_MEMBER } from '@/components/MemberFields';
+import StaffSessionNotice from '@/components/StaffSessionNotice';
 import { getSupabase } from '@/lib/supabase/client';
 import { logout } from '@/lib/logout';
 import { dt, d, errMsg } from '@/lib/format';
@@ -19,8 +20,7 @@ export default function AccountPage() {
   useEffect(() => {
     if (!authReady) return;
     if (!user) router.replace('/login?next=/account');
-    else if (isStaff) router.replace('/admin');
-  }, [authReady, user, isStaff, router]);
+  }, [authReady, user, router]);
 
   async function load() {
     const sb = getSupabase();
@@ -41,7 +41,8 @@ export default function AccountPage() {
     setEdit(null); setMsg({ ok: t('saved') }); load();
   }
 
-  if (!user || isStaff) return <p className="py-16 text-center text-ink-soft">…</p>;
+  if (!user) return <p className="py-16 text-center text-ink-soft">…</p>;
+  if (isStaff) return <div className="mx-auto max-w-md px-4 py-12"><StaffSessionNotice next="/login" /></div>;
   return (
     <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 lg:grid-cols-[1fr_1.3fr]">
       <section>
