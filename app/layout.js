@@ -1,9 +1,14 @@
 import './globals.css';
 import Providers from '@/components/Providers';
 
+const SITE = 'https://pahouaph22-hash.github.io/yadom-shop';
+const DESC = 'ຢາດົມສະໝຸນໄພລາວ — ยาดมสมุนไพรลาว — Lao herbal inhalers, retail and wholesale.';
 export const metadata = {
+  metadataBase: new URL(SITE + '/'),
   title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao',
-  description: 'ຢາດົມສະໝຸນໄພລາວ — ยาดมสมุนไพรลาว — Lao herbal inhalers, retail and wholesale.',
+  description: DESC,
+  openGraph: { type: 'website', siteName: 'Ya Dom Hom Lao', title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao', description: DESC, url: SITE + '/', locale: 'lo_LA' },
+  twitter: { card: 'summary', title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao', description: DESC },
 };
 export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#0F4C3A' };
 
