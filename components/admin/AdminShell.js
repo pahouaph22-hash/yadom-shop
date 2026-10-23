@@ -7,17 +7,17 @@ import { logout } from '@/lib/logout';
 
 // perm: required permission (admins have all). adminOnly: admins only.
 export const NAV = [
-  { href: '/admin', label: 'ภาพรวม' },
-  { href: '/admin/orders', label: 'คำสั่งซื้อ', perm: 'orders' },
-  { href: '/admin/products', label: 'สินค้าและสต็อก', perm: 'products' },
-  { href: '/admin/customers', label: 'สมาชิก / ลูกค้า', perm: 'customers' },
-  { href: '/admin/messages', label: 'ข้อความลูกค้า', perm: 'messages' },
-  { href: '/admin/reports', label: 'รายงานยอดขาย', perm: 'reports' },
-  { href: '/admin/expenses', label: 'ค่าใช้จ่าย', perm: 'finance' },
-  { href: '/admin/settings', label: 'ช่องทางติดต่อและตั้งค่า', perm: 'settings' },
-  { href: '/admin/staff', label: 'พนักงานและสิทธิ์', adminOnly: true },
-  { href: '/admin/audit', label: 'ประวัติการดำเนินงาน', perm: 'audit' },
-  { href: '/admin/backup', label: 'สำรองข้อมูล', adminOnly: true },
+  { href: '/admin', label: 'ภาพรวม', icon: '◈' },
+  { href: '/admin/orders', label: 'คำสั่งซื้อ', icon: '🛍', perm: 'orders' },
+  { href: '/admin/products', label: 'สินค้าและสต็อก', icon: '📦', perm: 'products' },
+  { href: '/admin/customers', label: 'สมาชิก / ลูกค้า', icon: '👥', perm: 'customers' },
+  { href: '/admin/messages', label: 'ข้อความลูกค้า', icon: '💬', perm: 'messages' },
+  { href: '/admin/reports', label: 'รายงานยอดขาย', icon: '📈', perm: 'reports' },
+  { href: '/admin/expenses', label: 'ค่าใช้จ่าย', icon: '🧾', perm: 'finance' },
+  { href: '/admin/settings', label: 'ช่องทางติดต่อและตั้งค่า', icon: '⚙', perm: 'settings' },
+  { href: '/admin/staff', label: 'พนักงานและสิทธิ์', icon: '🔑', adminOnly: true },
+  { href: '/admin/audit', label: 'ประวัติการดำเนินงาน', icon: '🕘', perm: 'audit' },
+  { href: '/admin/backup', label: 'สำรองข้อมูล', icon: '💾', adminOnly: true },
 ];
 
 export default function AdminShell({ children }) {
@@ -45,8 +45,8 @@ export default function AdminShell({ children }) {
     <nav className="flex flex-col gap-0.5">
       {items.map((n) => (
         <Link key={n.href} href={n.href} onClick={() => setOpen(false)}
-          className={`rounded-lg px-3 py-2 text-sm font-medium ${active(n.href) ? 'bg-white text-jade' : 'text-jade-mist hover:bg-white/10'}`}>
-          {n.label}
+          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${active(n.href) ? 'bg-white text-jade' : 'text-jade-mist hover:bg-white/10'}`}>
+          <span className="w-5 text-center" aria-hidden="true">{n.icon}</span>{n.label}
         </Link>
       ))}
     </nav>

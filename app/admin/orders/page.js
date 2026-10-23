@@ -92,7 +92,7 @@ function OrdersInner() {
       {rows === null ? <p className="text-ink-soft">กำลังโหลด…</p> : rows.length === 0 ? <Empty>ไม่พบคำสั่งซื้อตามเงื่อนไขนี้</Empty> : (
         <div className="card overflow-x-auto">
           <table className="tbl">
-            <thead><tr><th>เลขที่</th><th>วันที่</th><th>ลูกค้า</th><th>ช่องทาง</th><th>สถานะ</th><th className="text-right">ยอดรวม</th><th className="text-right">ชำระแล้ว</th></tr></thead>
+            <thead><tr><th>เลขที่</th><th>วันที่</th><th>ลูกค้า</th><th>ช่องทาง</th><th>สถานะ</th><th className="text-right">ยอดรวม</th><th className="text-right">การชำระ</th></tr></thead>
             <tbody>
               {rows.map((o) => {
                 const net = Number(o.paid_amount) - Number(o.refunded_amount);
@@ -101,10 +101,12 @@ function OrdersInner() {
                     <td><Link href={`/admin/orders/view?id=${o.id}`} className="font-semibold text-jade hover:underline">{o.order_no}</Link>{o.is_wholesale && <span className="ml-1 rounded bg-saffron-pale px-1 text-xs text-saffron-deep">ส่ง</span>}</td>
                     <td className="whitespace-nowrap text-xs">{dt(o.created_at)}</td>
                     <td>{o.customers?.name}<div className="text-xs text-ink-faint">{o.ship_phone}</div></td>
-                    <td className="text-xs">{CHANNEL_TH[o.channel]}</td>
+                    <td><span className={`chip ${o.channel === 'web' ? 'tone-indigo' : 'tone-gold'}`}>{CHANNEL_TH[o.channel]}</span></td>
                     <td><StatusBadge s={o.status} /></td>
                     <td className="text-right font-semibold">{kip(o.total)}</td>
-                    <td className={`text-right ${net < Number(o.total) && !['cancelled', 'refunded'].includes(o.status) ? 'text-red-700' : ''}`}>{kip(net)}</td>
+                    <td className="text-right">{net >= Number(o.total) ? <span className="chip tone-jade">✓ ครบ</span>
+                      : ['cancelled', 'refunded'].includes(o.status) ? <span className="text-ink-faint">{kip(net)}</span>
+                      : <span className="chip tone-rose">ค้าง {kip(Number(o.total) - net)}</span>}</td>
                   </tr>
                 );
               })}

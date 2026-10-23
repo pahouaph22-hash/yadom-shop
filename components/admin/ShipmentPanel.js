@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
-import { Alert, Modal } from './ui';
+import { Alert, Modal, SecTitle } from './ui';
 import { CARRIERS, carrierLabel, waNumber } from '@/lib/carriers';
 import { dt, errMsg } from '@/lib/format';
 import { withBase } from '@/lib/base';
@@ -64,13 +64,10 @@ export default function ShipmentPanel({ order, onChanged }) {
   if (list === null) return null;
   const last = list[list.length - 1];
   return (
-    <section className="card p-4 no-print">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-semibold">🚚 การจัดส่งและใบส่งพัสดุ</h2>
-        {!closed && <button className="btn-primary btn-sm" onClick={() => { setMsg({}); setEdit({ ...BLANK }); }}>+ บันทึกการจัดส่ง</button>}
-      </div>
+    <section className="card p-4 no-print md:p-5">
+      <SecTitle icon="🚚" tone="sky" actions={!closed && <button className="btn-primary btn-sm" onClick={() => { setMsg({}); setEdit({ ...BLANK }); }}>+ บันทึกการจัดส่ง</button>}>การจัดส่งและใบส่งพัสดุ</SecTitle>
       <Alert {...msg} />
-      {list.length === 0 ? <p className="text-sm text-ink-soft">ยังไม่ได้บันทึกการจัดส่ง — เมื่อส่งของให้บริษัทขนส่งแล้ว ให้บันทึกเลขพัสดุและถ่ายรูปใบส่งพัสดุแนบไว้ สถานะจะเปลี่ยนเป็น “กำลังจัดส่ง” อัตโนมัติ</p> : (
+      {list.length === 0 ? <p className="rounded-xl border border-dashed border-line p-4 text-sm text-ink-soft">ยังไม่ได้บันทึกการจัดส่ง — เมื่อส่งของให้บริษัทขนส่งแล้ว ให้บันทึกเลขพัสดุและถ่ายรูปใบส่งพัสดุแนบไว้ สถานะจะเปลี่ยนเป็น “กำลังจัดส่ง” อัตโนมัติ</p> : (
         <ul className="space-y-4">
           {list.map((s) => (
             <li key={s.id} className="rounded-xl border border-line p-3 text-sm">

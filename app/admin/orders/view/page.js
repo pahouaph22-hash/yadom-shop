@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useShop } from '@/components/Providers';
-import { PageHead, StatusBadge, Alert, Modal, useLoad, STATUS_TH, PM_TH, CHANNEL_TH, CTYPE_TH } from '@/components/admin/ui';
+import { StatusBadge, Alert, Modal, useLoad, Stat, SecTitle, STATUS_TH, PM_TH, CHANNEL_TH, CTYPE_TH } from '@/components/admin/ui';
 import { kip, dt, errMsg } from '@/lib/format';
 import SlipReview from '@/components/admin/SlipReview';
 import ShipmentPanel from '@/components/admin/ShipmentPanel';
@@ -17,6 +17,8 @@ const NEXT = {
   delivered: ['shipping'],
   cancelled: [], refunded: [],
 };
+const FLOW = ['received', 'pending_payment', 'paid', 'shipping', 'delivered'];
+const EVENT_DOT = { created: 'bg-violet-500', status: 'bg-jade', edit: 'bg-saffron', payment: 'bg-sky-500', refund: 'bg-rose-500', note: 'bg-slate-400' };
 const EVENT_TH = { created: 'สร้างคำสั่งซื้อ', status: 'เปลี่ยนสถานะ', edit: 'แก้ไขคำสั่งซื้อ', payment: 'รับชำระเงิน', refund: 'คืนเงิน', note: 'บันทึก' };
 
 function OrderDetail({ params }) {
@@ -58,99 +60,151 @@ function OrderDetail({ params }) {
 
   return (
     <>
-      <PageHead title={`คำสั่งซื้อ ${o.order_no}`} sub={`${dt(o.created_at)} · ${CHANNEL_TH[o.channel]}${o.is_wholesale ? ' · ขายส่ง' : ''}`}>
-        <Link href="/admin/orders" className="btn-ghost">← รายการ</Link>
-        <button onClick={() => window.print()} className="btn-ghost">พิมพ์ใบเสร็จ</button>
-      </PageHead>
+      {/* Header */}
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <Link href="/admin/orders" className="text-sm text-ink-soft hover:text-jade no-print">← คำสั่งซื้อทั้งหมด</Link>
+          <div className="mt-1 flex flex-wrap items-center gap-3">
+            <h1 className="font-display text-2xl font-bold tracking-wide md:text-3xl">{o.order_no}</h1>
+            <StatusBadge s={o.status} />
+            {o.is_wholesale && <span className="chip tone-gold">ขายส่ง</span>}
+          </div>
+          <p className="mt-1 text-sm text-ink-soft">{dt(o.created_at)} · ช่องทาง {CHANNEL_TH[o.channel]}</p>
+        </div>
+        <button onClick={() => window.print()} className="btn-ghost no-print">🖨 พิมพ์</button>
+      </div>
       <Alert {...msg} />
 
-      <div className="card mb-6 flex flex-wrap items-center gap-3 p-4 no-print">
-        <span className="text-sm text-ink-soft">สถานะปัจจุบัน</span><StatusBadge s={o.status} />
-        <span className="mx-2 hidden h-6 w-px bg-line sm:block" />
-        {NEXT[o.status].map((s) => (
-          <button key={s} onClick={() => changeStatus(s)} className={s === 'cancelled' ? 'btn-danger btn-sm' : 'btn-ghost btn-sm'}>→ {STATUS_TH[s]}</button>
-        ))}
-        {!closed && outstanding > 0 && <button onClick={() => { setMsg({}); setModal('pay'); }} className="btn-gold btn-sm">บันทึกการชำระเงิน</button>}
-        {isAdmin && net > 0 && <button onClick={() => { setMsg({}); setModal('refund'); }} className="btn-danger btn-sm">คืนเงิน</button>}
+      {/* Status pipeline + actions */}
+      <section className="card mb-5 p-4 no-print">
+        <ol className="mb-4 grid grid-cols-5 gap-1 text-center text-[11px] sm:text-xs">
+          {FLOW.map((s, i) => {
+            const idx = FLOW.indexOf(o.status);
+            const done = !closed && i <= idx;
+            const now = !closed && i === idx;
+            return (
+              <li key={s} className="flex flex-col items-center gap-1.5">
+                <span className={`h-2 w-full rounded-full ${done ? 'bg-jade' : 'bg-line'}`} />
+                <span className={`${now ? 'font-bold text-jade' : done ? 'text-ink' : 'text-ink-faint'}`}>{STATUS_TH[s]}</span>
+              </li>
+            );
+          })}
+        </ol>
+        {closed && <p className="mb-3 rounded-lg bg-slate-50 p-2 text-center text-sm text-slate-600">คำสั่งซื้อนี้ {STATUS_TH[o.status]} แล้ว</p>}
+        <div className="flex flex-wrap items-center gap-2">
+          {NEXT[o.status].length > 0 && <span className="mr-1 text-xs font-medium text-ink-soft">เปลี่ยนสถานะ:</span>}
+          {NEXT[o.status].map((s) => (
+            <button key={s} onClick={() => changeStatus(s)} className={s === 'cancelled' ? 'btn-danger btn-sm' : 'btn-ghost btn-sm'}>{s === 'cancelled' ? '✕' : '→'} {STATUS_TH[s]}</button>
+          ))}
+          <span className="flex-1" />
+          {!closed && outstanding > 0 && <button onClick={() => { setMsg({}); setModal('pay'); }} className="btn-gold btn-sm">💰 บันทึกการชำระเงิน</button>}
+          {isAdmin && net > 0 && <button onClick={() => { setMsg({}); setModal('refund'); }} className="btn-danger btn-sm">↩ คืนเงิน</button>}
+        </div>
+      </section>
+
+      {/* Money summary */}
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat icon="🧾" label="ยอดรวมคำสั่งซื้อ" value={kip(o.total)} tone="jade" />
+        <Stat icon="✓" label="ชำระแล้ว (สุทธิ)" value={kip(net)} tone="sky" />
+        <Stat icon="⏳" label="ค้างชำระ" value={kip(closed ? 0 : Math.max(outstanding, 0))} tone={!closed && outstanding > 0 ? 'red' : 'ink'} />
+        <Stat icon="📦" label="จำนวนสินค้า" value={`${items.reduce((n, i) => n + i.qty, 0)} ชิ้น`} tone="gold" hint={`${items.length} รายการ`} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <div className="space-y-6">
-          <section className="card overflow-x-auto">
-            <div className="flex items-center justify-between p-4 pb-2">
-              <h2 className="font-semibold">รายการสินค้า</h2>
-              {editableItems && <button onClick={() => { setMsg({}); setModal('items'); }} className="btn-ghost btn-sm no-print">แก้ไขรายการ</button>}
+      <div className="grid gap-6 lg:grid-cols-[1.65fr_1fr]">
+        <div className="min-w-0 space-y-6">
+          <section className="card p-4 md:p-5">
+            <SecTitle icon="🛍" tone="jade" actions={editableItems && <button onClick={() => { setMsg({}); setModal('items'); }} className="btn-ghost btn-sm no-print">✎ แก้ไขรายการ</button>}>รายการสินค้า</SecTitle>
+            <div className="tbl-wrap">
+              <table className="tbl">
+                <thead><tr><th>สินค้า</th><th className="text-right">จำนวน</th><th className="text-right">ราคา/หน่วย</th><th className="text-right">รวม</th>{showCost && <th className="text-right no-print">ต้นทุน/หน่วย</th>}</tr></thead>
+                <tbody>
+                  {items.map((i) => (
+                    <tr key={i.id}>
+                      <td>
+                        <p className="font-medium">{i.product_name}</p>
+                        <p className="text-xs text-ink-faint">{i.sku}{i.is_wholesale_price && <span className="chip tone-gold ml-2 px-1.5 py-0">ราคาส่ง</span>}</p>
+                      </td>
+                      <td className="text-right font-semibold">{i.qty}</td>
+                      <td className="text-right">{kip(i.unit_price)}</td>
+                      <td className="text-right font-semibold">{kip(i.line_total)}</td>
+                      {showCost && <td className="text-right text-ink-faint no-print">{kip(i.unit_cost)}</td>}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <table className="tbl">
-              <thead><tr><th>สินค้า</th><th className="text-right">จำนวน</th><th className="text-right">ราคา/หน่วย</th><th className="text-right">รวม</th>{showCost && <th className="text-right no-print">ต้นทุน/หน่วย</th>}</tr></thead>
-              <tbody>
-                {items.map((i) => (
-                  <tr key={i.id}>
-                    <td>{i.product_name} <span className="text-xs text-ink-faint">{i.sku}</span>{i.is_wholesale_price && <span className="ml-1 rounded bg-saffron-pale px-1 text-xs text-saffron-deep">ราคาส่ง</span>}</td>
-                    <td className="text-right">{i.qty}</td><td className="text-right">{kip(i.unit_price)}</td>
-                    <td className="text-right">{kip(i.line_total)}</td>{showCost && <td className="text-right text-ink-faint no-print">{kip(i.unit_cost)}</td>}
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr><td colSpan={3} className="text-right">ค่าสินค้า</td><td className="text-right">{kip(o.subtotal)}</td><td className="no-print" /></tr>
-                <tr><td colSpan={3} className="text-right">ส่วนลด</td><td className="text-right">−{kip(o.discount)}</td><td className="no-print" /></tr>
-                <tr><td colSpan={3} className="text-right">ค่าจัดส่ง</td><td className="text-right">{kip(o.shipping_fee)}</td><td className="no-print" /></tr>
-                <tr className="text-base font-bold"><td colSpan={3} className="text-right">ยอดรวม</td><td className="text-right">{kip(o.total)}</td><td className="no-print" /></tr>
-                <tr><td colSpan={3} className="text-right">ชำระแล้ว (สุทธิ)</td><td className="text-right text-jade">{kip(net)}</td><td className="no-print" /></tr>
-                {outstanding > 0 && !closed && <tr className="font-semibold text-red-700"><td colSpan={3} className="text-right">ค้างชำระ</td><td className="text-right">{kip(outstanding)}</td><td className="no-print" /></tr>}
-              </tfoot>
-            </table>
-            {!closed && <div className="p-4 pt-2 no-print"><button onClick={() => { setMsg({}); setModal('fees'); }} className="btn-ghost btn-sm">แก้ไขส่วนลด / ค่าจัดส่ง / ที่อยู่ / หมายเหตุ</button></div>}
-            {closed && <div className="p-4 pt-2 no-print"><button onClick={() => { setMsg({}); setModal('note'); }} className="btn-ghost btn-sm">แก้ไขหมายเหตุภายใน</button></div>}
+            <div className="mt-4 flex flex-col-reverse gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="no-print">
+                {!closed && <button onClick={() => { setMsg({}); setModal('fees'); }} className="btn-ghost btn-sm">✎ ส่วนลด / ค่าส่ง / ที่อยู่ / หมายเหตุ</button>}
+                {closed && <button onClick={() => { setMsg({}); setModal('note'); }} className="btn-ghost btn-sm">✎ หมายเหตุภายใน</button>}
+              </div>
+              <dl className="num w-full space-y-1.5 rounded-xl bg-jade-wash/70 p-4 text-sm sm:w-72">
+                <div className="flex justify-between"><dt className="text-ink-soft">ค่าสินค้า</dt><dd>{kip(o.subtotal)}</dd></div>
+                {Number(o.discount) > 0 && <div className="flex justify-between text-rose-700"><dt>ส่วนลด</dt><dd>−{kip(o.discount)}</dd></div>}
+                <div className="flex justify-between"><dt className="text-ink-soft">ค่าจัดส่ง</dt><dd>{Number(o.shipping_fee) > 0 ? kip(o.shipping_fee) : 'ฟรี'}</dd></div>
+                <div className="flex justify-between border-t border-line pt-2 text-base font-bold"><dt>ยอดรวม</dt><dd className="text-jade">{kip(o.total)}</dd></div>
+                <div className="flex justify-between text-sky-700"><dt>ชำระแล้ว</dt><dd>{kip(net)}</dd></div>
+                {outstanding > 0 && !closed && <div className="flex justify-between font-semibold text-rose-700"><dt>ค้างชำระ</dt><dd>{kip(outstanding)}</dd></div>}
+              </dl>
+            </div>
           </section>
 
           <SlipReview orderId={id} outstanding={closed ? 0 : outstanding} onChanged={reload} />
 
           <ShipmentPanel order={o} onChanged={reload} />
 
-          <section className="card p-4">
-            <h2 className="mb-3 font-semibold">การชำระเงินและการคืนเงิน</h2>
-            {pays.length === 0 ? <p className="text-sm text-ink-soft">ยังไม่มีการชำระเงิน</p> : (
-              <table className="tbl">
-                <thead><tr><th>วันที่</th><th>ประเภท</th><th>วิธี</th><th>เลขอ้างอิง</th><th className="text-right">จำนวน</th></tr></thead>
-                <tbody>
-                  {pays.map((p) => (
-                    <tr key={p.id}>
-                      <td className="text-xs">{dt(p.paid_at)}</td>
-                      <td>{p.kind === 'refund' ? <span className="text-red-700">คืนเงิน</span> : 'รับชำระ'}{p.note && <div className="text-xs text-ink-faint">{p.note}</div>}</td>
-                      <td>{PM_TH[p.method]}</td><td className="text-xs">{p.reference || '—'}</td>
-                      <td className={`text-right font-semibold ${p.kind === 'refund' ? 'text-red-700' : ''}`}>{p.kind === 'refund' ? '−' : ''}{kip(p.amount)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <section className="card p-4 md:p-5">
+            <SecTitle icon="💳" tone="sky">การชำระเงินและการคืนเงิน</SecTitle>
+            {pays.length === 0 ? <p className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-ink-soft">ยังไม่มีการชำระเงิน</p> : (
+              <div className="tbl-wrap">
+                <table className="tbl">
+                  <thead><tr><th>วันที่</th><th>ประเภท</th><th>วิธี</th><th>เลขอ้างอิง</th><th className="text-right">จำนวน</th></tr></thead>
+                  <tbody>
+                    {pays.map((p) => (
+                      <tr key={p.id}>
+                        <td className="whitespace-nowrap text-xs text-ink-soft">{dt(p.paid_at)}</td>
+                        <td>{p.kind === 'refund' ? <span className="chip tone-rose">↩ คืนเงิน</span> : <span className="chip tone-jade">✓ รับชำระ</span>}
+                          {p.note && <div className="mt-1 text-xs text-ink-faint">{p.note}</div>}</td>
+                        <td>{PM_TH[p.method]}</td><td className="text-xs">{p.reference || '—'}</td>
+                        <td className={`text-right font-bold ${p.kind === 'refund' ? 'text-rose-700' : 'text-jade'}`}>{p.kind === 'refund' ? '−' : '+'}{kip(p.amount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
         </div>
 
         <div className="space-y-6">
-          <section className="card p-4 text-sm">
-            <h2 className="mb-3 font-semibold">ลูกค้าและการจัดส่ง</h2>
-            <p><Link href={`/admin/customers/edit?id=${o.customer_id}`} className="font-semibold text-jade hover:underline">{o.customers?.name}</Link> <span className="text-xs text-ink-faint">({CTYPE_TH[o.customers?.type]})</span></p>
-            <dl className="mt-3 space-y-2">
-              <div><dt className="text-xs text-ink-faint">ผู้รับ</dt><dd>{o.ship_name} · <a className="text-jade" href={`tel:${o.ship_phone}`}>{o.ship_phone}</a></dd></div>
-              <div><dt className="text-xs text-ink-faint">ที่อยู่จัดส่ง</dt><dd className="whitespace-pre-line">{o.ship_address || '—'}</dd></div>
-              <div><dt className="text-xs text-ink-faint">วิธีชำระที่ลูกค้าเลือก</dt><dd>{PM_TH[o.payment_method_pref] || o.payment_method_pref || '—'}</dd></div>
-              {o.customer_note && <div><dt className="text-xs text-ink-faint">หมายเหตุจากลูกค้า</dt><dd className="rounded bg-saffron-pale p-2">{o.customer_note}</dd></div>}
-              {o.internal_note && <div className="no-print"><dt className="text-xs text-ink-faint">หมายเหตุภายใน</dt><dd className="rounded bg-jade-wash p-2">{o.internal_note}</dd></div>}
+          <section className="card p-4 text-sm md:p-5">
+            <SecTitle icon="👤" tone="violet">ลูกค้าและการจัดส่ง</SecTitle>
+            <div className="flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-saffron font-bold text-ink">{(o.customers?.name || '?').slice(0, 1).toUpperCase()}</span>
+              <div>
+                <Link href={`/admin/customers/edit?id=${o.customer_id}`} className="font-semibold text-jade hover:underline">{o.customers?.name}</Link>
+                <p className="text-xs text-ink-faint">{CTYPE_TH[o.customers?.type]}{o.user_id ? ' · สมาชิก' : ''}</p>
+              </div>
+            </div>
+            <dl className="mt-4 space-y-3">
+              <div className="flex gap-3"><dt className="w-5 shrink-0" aria-label="ผู้รับ">👤</dt><dd>{o.ship_name}</dd></div>
+              <div className="flex gap-3"><dt className="w-5 shrink-0" aria-label="เบอร์">📞</dt><dd><a className="text-jade hover:underline" href={`tel:${o.ship_phone}`}>{o.ship_phone}</a></dd></div>
+              <div className="flex gap-3"><dt className="w-5 shrink-0" aria-label="ที่อยู่">📍</dt><dd className="whitespace-pre-line">{o.ship_address || '—'}</dd></div>
+              <div className="flex gap-3"><dt className="w-5 shrink-0" aria-label="วิธีชำระ">💳</dt><dd>{PM_TH[o.payment_method_pref] || o.payment_method_pref || '—'}</dd></div>
             </dl>
+            {o.customer_note && <div className="mt-4 rounded-xl bg-saffron-pale p-3"><p className="text-xs font-semibold text-saffron-deep">หมายเหตุจากลูกค้า</p><p>{o.customer_note}</p></div>}
+            {o.internal_note && <div className="mt-3 rounded-xl bg-jade-wash p-3 no-print"><p className="text-xs font-semibold text-jade">หมายเหตุภายใน</p><p>{o.internal_note}</p></div>}
           </section>
-          <section className="card p-4 no-print">
-            <h2 className="mb-3 font-semibold">ประวัติคำสั่งซื้อ</h2>
-            <ol className="space-y-3 border-l-2 border-line pl-4 text-sm">
+
+          <section className="card p-4 no-print md:p-5">
+            <SecTitle icon="🕘" tone="indigo">ประวัติคำสั่งซื้อ</SecTitle>
+            <ol className="relative space-y-4 pl-6 text-sm before:absolute before:bottom-1 before:left-[7px] before:top-1 before:w-0.5 before:bg-line">
               {ev.map((e) => (
-                <li key={e.id}>
-                  <p className="font-semibold">{EVENT_TH[e.event]}{e.to_status && <> → {STATUS_TH[e.to_status]}</>}
-                    {e.data?.amount && <> · {kip(e.data.amount)}</>}</p>
-                  {e.event === 'edit' && e.data && (
-                    <p className="text-xs text-ink-soft">ยอดรวม {kip(e.data.before?.total)} → {kip(e.data.after?.total)}</p>
-                  )}
+                <li key={e.id} className="relative">
+                  <span className={`absolute -left-6 top-1 h-4 w-4 rounded-full border-2 border-white ${EVENT_DOT[e.event] || 'bg-slate-400'}`} aria-hidden="true" />
+                  <p className="font-semibold">{EVENT_TH[e.event]}{e.to_status && <> → <span className="text-jade">{STATUS_TH[e.to_status]}</span></>}
+                    {e.data?.amount && <span className="num"> · {kip(e.data.amount)}</span>}</p>
+                  {e.event === 'edit' && e.data && <p className="text-xs text-ink-soft">ยอดรวม {kip(e.data.before?.total)} → {kip(e.data.after?.total)}</p>}
                   {e.note && <p className="text-xs text-ink-soft">“{e.note}”</p>}
                   <p className="text-xs text-ink-faint">{dt(e.created_at)} · {e.actor_email || 'ลูกค้า (หน้าเว็บ)'}</p>
                 </li>

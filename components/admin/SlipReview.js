@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
-import { Alert, Modal, PM_TH } from './ui';
+import { Alert, Modal, PM_TH, SecTitle } from './ui';
 import { kip, dt, errMsg } from '@/lib/format';
 
 const ST = { pending: ['รอตรวจสอบ', 'bg-saffron-pale text-saffron-deep'], approved: ['ยืนยันแล้ว', 'bg-jade-mist text-jade'], rejected: ['ปฏิเสธ', 'bg-red-50 text-red-700'] };
@@ -38,10 +38,10 @@ export default function SlipReview({ orderId, outstanding, onChanged }) {
 
   if (slips === null) return null;
   return (
-    <section className="card p-4 no-print">
-      <h2 className="mb-3 font-semibold">สลิปการโอนจากลูกค้า {slips.some((s) => s.status === 'pending') && <span className="ml-1 rounded-full bg-saffron px-2 text-xs">มีสลิปรอตรวจ</span>}</h2>
+    <section className="card p-4 no-print md:p-5">
+      <SecTitle icon="📎" tone="gold" actions={slips.some((s) => s.status === 'pending') && <span className="chip bg-saffron text-ink">● มีสลิปรอตรวจ</span>}>สลิปการโอนจากลูกค้า</SecTitle>
       <Alert {...msg} />
-      {slips.length === 0 ? <p className="text-sm text-ink-soft">ลูกค้ายังไม่ได้ส่งสลิป</p> : (
+      {slips.length === 0 ? <p className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-ink-soft">ลูกค้ายังไม่ได้ส่งสลิป</p> : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {slips.map((s) => {
             const url = urls[s.file_path];

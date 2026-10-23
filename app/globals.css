@@ -24,11 +24,35 @@ body { background: #F7FAF8; color: #18231F; }
 .btn-sm { @apply px-3 py-1.5 text-xs; }
 .input { @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-jade focus:ring-2 focus:ring-jade/20; }
 .label { @apply mb-1 block text-sm font-medium text-ink-soft; }
-.card { @apply rounded-xl border border-line bg-white; }
-.tbl { @apply w-full text-sm; }
-.tbl th { @apply border-b border-line bg-jade-wash px-3 py-2 text-left font-semibold text-ink-soft whitespace-nowrap; }
-.tbl td { @apply border-b border-line/70 px-3 py-2 align-top; }
-.tbl tr:hover td { @apply bg-jade-wash/60; }
+@layer components {
+.card { @apply rounded-2xl border border-line/80 bg-white shadow-[0_1px_2px_rgba(15,76,58,0.04),0_4px_16px_-8px_rgba(15,76,58,0.12)]; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Tables: tinted header, airy rows, aligned numbers */
+.tbl { @apply w-full border-separate border-spacing-0 text-sm; font-variant-numeric: tabular-nums; }
+.tbl :where(thead th) { @apply whitespace-nowrap border-b border-line bg-jade-wash px-4 py-3 text-left text-xs font-semibold text-jade; }
+.tbl thead th:first-child { @apply rounded-tl-xl; }
+.tbl thead th:last-child { @apply rounded-tr-xl; }
+.tbl :where(tbody td) { @apply border-b border-line/60 px-4 py-3 align-middle; }
+.tbl tbody tr:last-child td { @apply border-b-0; }
+.tbl tbody tr { @apply transition-colors; }
+.tbl tbody tr:hover td { @apply bg-jade-wash/50; }
+.tbl :where(tfoot td) { @apply px-4 py-2; }
+.tbl-wrap { @apply overflow-x-auto rounded-xl border border-line/80; }
+
+/* Section heading with a coloured icon chip */
+.sec-title { @apply flex items-center gap-2.5 font-semibold text-ink; }
+.sec-icon { @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-base; }
+.tone-jade { @apply bg-jade-mist text-jade; }
+.tone-gold { @apply bg-saffron-pale text-saffron-deep; }
+.tone-indigo { background: #E6E9F3; color: #2C3A63; }
+.tone-sky { @apply bg-sky-100 text-sky-700; }
+.tone-rose { @apply bg-rose-100 text-rose-700; }
+.tone-violet { @apply bg-violet-100 text-violet-700; }
+
+.chip { @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold; }
+
+}
 
 :focus-visible { outline: 2px solid #E0A526; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

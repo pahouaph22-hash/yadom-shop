@@ -26,10 +26,10 @@ export default function Dashboard() {
       </PageHead>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="ยอดขายวันนี้" value={kip(today.gross_sales)} href="/admin/reports" />
-        <Stat label="คำสั่งซื้อวันนี้" value={today.orders_count ?? 0} tone="ink" href="/admin/orders" />
-        <Stat label="รับเงินจริงวันนี้" value={kip(Number(today.received || 0) - Number(today.refunds || 0))} tone="gold" />
-        <Stat label="ยอดค้างชำระทั้งหมด" value={kip(d.unpaid_total)} tone="red" href="/admin/orders?unpaid=1" />
+        <Stat icon="💰" label="ยอดขายวันนี้" value={kip(today.gross_sales)} tone="jade" href="/admin/reports" />
+        <Stat icon="🛍" label="คำสั่งซื้อวันนี้" value={today.orders_count ?? 0} tone="sky" href="/admin/orders" />
+        <Stat icon="✓" label="รับเงินจริงวันนี้" value={kip(Number(today.received || 0) - Number(today.refunds || 0))} tone="gold" />
+        <Stat icon="⏳" label="ยอดค้างชำระทั้งหมด" value={kip(d.unpaid_total)} tone="red" href="/admin/orders?unpaid=1" />
       </div>
 
       {slips?.length > 0 && (
@@ -43,17 +43,17 @@ export default function Dashboard() {
 
       <h2 className="mb-3 mt-8 font-semibold text-ink-soft">เดือนนี้</h2>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <Stat label="ยอดขาย" value={kip(m.gross_sales)} />
-        <Stat label="รับเงินจริง (สุทธิหลังคืนเงิน)" value={kip(Number(m.received || 0) - Number(m.refunds || 0))} tone="gold" />
-        <Stat label="ต้นทุนสินค้าที่ขาย" value={kip(m.cogs)} tone="ink" />
-        {isAdmin && <Stat label="ค่าใช้จ่ายดำเนินงาน" value={kip(m.op_expenses)} tone="ink" href="/admin/expenses" />}
-        {isAdmin && <Stat label="กำไรโดยประมาณ" value={kip(m.profit)} tone={Number(m.profit) < 0 ? 'red' : 'jade'} href="/admin/reports" />}
+        <Stat icon="📈" label="ยอดขาย" value={kip(m.gross_sales)} />
+        <Stat icon="💵" label="รับเงินจริง (สุทธิหลังคืนเงิน)" value={kip(Number(m.received || 0) - Number(m.refunds || 0))} tone="gold" />
+        <Stat icon="📦" label="ต้นทุนสินค้าที่ขาย" value={kip(m.cogs)} tone="ink" />
+        {isAdmin && <Stat icon="🧾" label="ค่าใช้จ่ายดำเนินงาน" value={kip(m.op_expenses)} tone="ink" href="/admin/expenses" />}
+        {isAdmin && <Stat icon="✨" label="กำไรโดยประมาณ" value={kip(m.profit)} tone={Number(m.profit) < 0 ? 'red' : 'jade'} href="/admin/reports" />}
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <section className="card p-4">
+        <section className="card p-4 md:p-5">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-semibold">คำสั่งซื้อที่ต้องดำเนินการ</h2>
+            <h2 className="sec-title"><span className="sec-icon tone-jade">🛍</span>คำสั่งซื้อที่ต้องดำเนินการ</h2>
             {Number(d.new_messages) > 0 && <Link href="/admin/messages" className="rounded-full bg-saffron px-2 py-0.5 text-xs font-semibold">ข้อความใหม่ {d.new_messages}</Link>}
           </div>
           <div className="mb-4 flex flex-wrap gap-2">
@@ -79,8 +79,8 @@ export default function Dashboard() {
           )}
         </section>
 
-        <section className="card p-4">
-          <h2 className="mb-3 font-semibold">สินค้าใกล้หมด</h2>
+        <section className="card p-4 md:p-5">
+          <h2 className="sec-title mb-3"><span className="sec-icon tone-rose">⚠</span>สินค้าใกล้หมด</h2>
           {d.low_stock.length === 0 ? <Empty>สต็อกทุกรายการยังเพียงพอ</Empty> : (
             <ul className="divide-y divide-line">
               {d.low_stock.map((p) => (
@@ -94,7 +94,7 @@ export default function Dashboard() {
           {canAudit && (
             <>
               <div className="mb-3 mt-6 flex items-center justify-between">
-                <h2 className="font-semibold">กิจกรรมล่าสุด</h2>
+                <h2 className="sec-title"><span className="sec-icon tone-indigo">🕘</span>กิจกรรมล่าสุด</h2>
                 <Link href="/admin/audit" className="text-sm text-jade hover:underline">ดูทั้งหมด</Link>
               </div>
               <ul className="space-y-2 text-sm">

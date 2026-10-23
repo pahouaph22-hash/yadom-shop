@@ -9,11 +9,11 @@ export const STATUS_TH = {
   delivered: 'ส่งมอบสำเร็จ', cancelled: 'ยกเลิก', refunded: 'คืนเงินแล้ว',
 };
 const STATUS_CLS = {
-  received: 'bg-indigo-dye/10 text-indigo-dye', pending_payment: 'bg-saffron-pale text-saffron-deep', paid: 'bg-jade-mist text-jade',
-  shipping: 'bg-sky-100 text-sky-800', delivered: 'bg-jade text-white', cancelled: 'bg-red-50 text-red-700', refunded: 'bg-red-100 text-red-800',
+  received: 'bg-violet-50 text-violet-700', pending_payment: 'bg-saffron-pale text-saffron-deep', paid: 'bg-emerald-50 text-emerald-700',
+  shipping: 'bg-sky-50 text-sky-700', delivered: 'bg-jade text-white', cancelled: 'bg-slate-100 text-slate-500', refunded: 'bg-rose-50 text-rose-700',
 };
 export function StatusBadge({ s }) {
-  return <span className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_CLS[s] || ''}`}>{STATUS_TH[s] || s}</span>;
+  return <span className={`chip ${STATUS_CLS[s] || ''}`}><span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" aria-hidden="true" />{STATUS_TH[s] || s}</span>;
 }
 export const CTYPE_TH = { retail: 'ทั่วไป', regular: 'ลูกค้าประจำ', wholesale: 'ขายส่ง' };
 export const PM_TH = { cash: 'เงินสด', bank_transfer: 'โอนเงิน', bcel_one: 'BCEL One', ldb: 'LDB', qr: 'QR', cod: 'เก็บปลายทาง', other: 'อื่น ๆ' };
@@ -74,13 +74,34 @@ export function Modal({ title, onClose, children }) {
   );
 }
 
-export function Stat({ label, value, tone = 'jade', href }) {
-  const tones = { jade: 'text-jade', gold: 'text-saffron-deep', red: 'text-red-700', ink: 'text-ink' };
+const STAT_TONE = {
+  jade: ['bg-jade-mist/60 border-jade/15', 'text-jade', 'bg-jade text-white'],
+  gold: ['bg-saffron-pale/70 border-saffron/25', 'text-saffron-deep', 'bg-saffron text-ink'],
+  red: ['bg-rose-50 border-rose-200/60', 'text-rose-700', 'bg-rose-600 text-white'],
+  ink: ['bg-white border-line/80', 'text-ink', 'bg-indigo-dye text-white'],
+  sky: ['bg-sky-50 border-sky-200/60', 'text-sky-800', 'bg-sky-600 text-white'],
+};
+export function Stat({ label, value, tone = 'jade', href, icon, hint }) {
+  const [bg, fg, ic] = STAT_TONE[tone] || STAT_TONE.jade;
   const body = (
-    <>
-      <p className="text-xs text-ink-soft">{label}</p>
-      <p className={`mt-1 text-2xl font-bold ${tones[tone]}`}>{value}</p>
-    </>
+    <div className="flex items-start gap-3">
+      {icon && <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-base ${ic}`} aria-hidden="true">{icon}</span>}
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-ink-soft">{label}</p>
+        <p className={`num mt-0.5 truncate text-xl font-bold md:text-2xl ${fg}`}>{value}</p>
+        {hint && <p className="mt-0.5 text-xs text-ink-faint">{hint}</p>}
+      </div>
+    </div>
   );
-  return href ? <Link href={href} className="card block p-4 hover:border-jade">{body}</Link> : <div className="card p-4">{body}</div>;
+  const cls = `block rounded-2xl border p-4 ${bg}`;
+  return href ? <Link href={href} className={`${cls} transition hover:-translate-y-0.5 hover:shadow-md`}>{body}</Link> : <div className={cls}>{body}</div>;
+}
+
+export function SecTitle({ icon, tone = 'jade', children, actions }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <h2 className="sec-title">{icon && <span className={`sec-icon tone-${tone}`} aria-hidden="true">{icon}</span>}{children}</h2>
+      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+    </div>
+  );
 }
