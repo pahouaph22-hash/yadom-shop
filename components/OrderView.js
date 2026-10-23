@@ -4,6 +4,8 @@ import { useShop } from './Providers';
 import { getSupabase } from '@/lib/supabase/client';
 import OrderTimeline from './OrderTimeline';
 import PaymentBox from './PaymentBox';
+import ShipmentBox from './ShipmentBox';
+import Link from 'next/link';
 import { dt } from '@/lib/format';
 
 export default function OrderView({ orderNo, phone, isNew }) {
@@ -30,6 +32,7 @@ export default function OrderView({ orderNo, phone, isNew }) {
       <OrderTimeline status={order.status} history={order.history} />
       {['received', 'pending_payment'].includes(order.status) || Number(order.paid) < Number(order.total)
         ? <PaymentBox order={order} phone={phone} onChanged={load} /> : null}
+      <ShipmentBox order={order} phone={phone} />
       <table className="tbl card overflow-hidden">
         <thead><tr><th>{t('products')}</th><th className="text-right">{t('qty')}</th><th className="text-right">{t('price')}</th><th className="text-right">{t('total')}</th></tr></thead>
         <tbody>
@@ -44,6 +47,9 @@ export default function OrderView({ orderNo, phone, isNew }) {
           <tr className="font-bold"><td colSpan={3} className="text-right">{t('total')}</td><td className="text-right">{fmt(order.total)}</td></tr>
         </tfoot>
       </table>
+      <div className="flex justify-end">
+        <Link href={`/receipt?no=${encodeURIComponent(order.order_no)}&phone=${encodeURIComponent(phone)}`} className="btn-ghost">🧾 {t('viewReceipt')}</Link>
+      </div>
     </div>
   );
 }

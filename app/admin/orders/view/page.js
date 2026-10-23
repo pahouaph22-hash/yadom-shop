@@ -7,6 +7,7 @@ import { useShop } from '@/components/Providers';
 import { PageHead, StatusBadge, Alert, Modal, useLoad, STATUS_TH, PM_TH, CHANNEL_TH, CTYPE_TH } from '@/components/admin/ui';
 import { kip, dt, errMsg } from '@/lib/format';
 import SlipReview from '@/components/admin/SlipReview';
+import ShipmentPanel from '@/components/admin/ShipmentPanel';
 
 const NEXT = {
   received: ['pending_payment', 'shipping', 'delivered', 'cancelled'],
@@ -104,6 +105,8 @@ function OrderDetail({ params }) {
           </section>
 
           <SlipReview orderId={id} outstanding={closed ? 0 : outstanding} onChanged={reload} />
+
+          <ShipmentPanel order={o} onChanged={reload} />
 
           <section className="card p-4">
             <h2 className="mb-3 font-semibold">การชำระเงินและการคืนเงิน</h2>
