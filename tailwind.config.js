@@ -12,7 +12,7 @@ module.exports = {
       },
       fontFamily: {
         display: ['"Noto Serif Lao"', '"Noto Serif Thai"', '"Noto Serif"', 'serif'],
-        sans: ['"Noto Sans Lao"', '"Noto Sans Thai"', '"Noto Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Geist"', '"Noto Sans Lao"', '"Noto Sans Thai"', '"Noto Sans"', 'system-ui', 'sans-serif'],
       },
     },
   },
