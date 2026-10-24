@@ -61,7 +61,7 @@ export default function Home({ products, loading, loadError }) {
           {[['🏆', 'dreamStat1v', 'dreamStat1'], ['💰', 'dreamStat2v', 'dreamStat2'], ['👥', 'dreamStat3v', 'dreamStat3'], ['📅', 'dreamStat4v', 'dreamStat4']].map(([ic, v, k]) => (
             <div key={k} className="rounded-2xl border border-line bg-white p-4 shadow-sm">
               <dt className="text-xs font-semibold text-ink-faint"><span aria-hidden="true">{ic}</span> {t(k)}</dt>
-              <dd className="mt-1 text-lg font-bold text-jade md:text-xl">{t(v)}</dd>
+              <dd className="mt-1 text-lg font-bold text-jade md:text-xl">{t(v)}{k === 'dreamStat3' && <span className="mt-0.5 block text-xs font-medium text-ink-soft">{t('dreamStat3s')}</span>}</dd>
             </div>
           ))}
         </dl>
