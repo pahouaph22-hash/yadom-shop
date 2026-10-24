@@ -152,7 +152,7 @@ function ProductEdit({ params }) {
           <div className="grid grid-cols-2 gap-3">
             {isNew
               ? <label className="block"><span className="label">สต็อกเริ่มต้น</span><input type="number" min={0} className="input" value={f.stock} onChange={set('stock')} /></label>
-              : <div><span className="label">คงเหลือ</span><p className="py-2 text-xl font-bold">{f.stock}</p></div>}
+              : <QuickStock p={f} onMore={() => setStockModal(true)} onDone={(n) => { setF((x) => ({ ...x, stock: n })); reloadMoves(); setMsg({ ok: `เพิ่มสต็อกแล้ว — คงเหลือ ${n} ชิ้น` }); }} />}
             <label className="block"><span className="label">แจ้งเตือนเมื่อเหลือ ≤</span><input type="number" min={0} className="input" value={f.low_stock_threshold} onChange={set('low_stock_threshold')} /></label>
             <label className="block"><span className="label">ลำดับการแสดง</span><input type="number" className="input" value={f.sort} onChange={set('sort')} /></label>
             <label className="flex items-center gap-2 pt-6 text-sm"><input type="checkbox" checked={!!f.is_active} onChange={set('is_active')} /> เปิดขายบนหน้าร้าน</label>
@@ -182,6 +182,37 @@ function ProductEdit({ params }) {
 
       {stockModal && <StockModal p={f} isAdmin={can('finance')} onClose={() => setStockModal(false)} onDone={() => { setStockModal(false); load(); reloadMoves(); }} />}
     </>
+  );
+}
+
+// Inline "add stock" box: type a number, press add. Goes through adjust_stock (logged in stock history + audit).
+function QuickStock({ p, onDone, onMore }) {
+  const [qty, setQty] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  async function add() {
+    const n = Math.floor(Number(qty));
+    if (!n || n < 1) return setError('ใส่จำนวนที่ต้องการเพิ่ม (อย่างน้อย 1)');
+    setBusy(true); setError('');
+    const { data, error: err } = await getSupabase().rpc('adjust_stock', { p_product_id: p.id, p_change: n, p_reason: 'restock', p_note: 'เพิ่มจากหน้าแก้ไขสินค้า' });
+    setBusy(false);
+    if (err) return setError(errMsg(err));
+    setQty('');
+    onDone(typeof data === 'number' ? data : Number(p.stock) + n);
+  }
+  return (
+    <div className="col-span-2 rounded-xl border-2 border-saffron/60 bg-saffron-pale/50 p-3">
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-[90px]"><span className="label">คงเหลือตอนนี้</span><p className={`text-2xl font-bold ${Number(p.stock) === 0 ? 'text-red-600' : 'text-ink'}`}>{p.stock} <span className="text-sm font-normal text-ink-soft">ชิ้น</span></p></div>
+        <label className="block flex-1 min-w-[140px]"><span className="label">เพิ่มจำนวนสินค้า (ชิ้น)</span>
+          <input type="number" min={1} inputMode="numeric" className="input" placeholder="เช่น 100" value={qty}
+            onChange={(e) => setQty(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} /></label>
+        <button type="button" disabled={busy} onClick={add} className="btn-gold h-[42px] px-5">{busy ? 'กำลังเพิ่ม…' : '+ เพิ่มสต็อก'}</button>
+      </div>
+      {qty && Number(qty) > 0 && <p className="mt-2 text-xs text-ink-soft">หลังเพิ่ม: <b>{Number(p.stock) + Math.floor(Number(qty))}</b> ชิ้น</p>}
+      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+      <button type="button" onClick={onMore} className="mt-2 text-xs text-jade underline">ตัดสต็อก / ตรวจนับยอดใหม่ / บันทึกค่าใช้จ่ายล็อต →</button>
+    </div>
   );
 }
 
