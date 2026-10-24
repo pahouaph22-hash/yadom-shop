@@ -6,6 +6,7 @@ import { pickLang } from '@/lib/format';
 import { ChannelIcon, channelHref, CHANNEL_LABEL } from './channels';
 import { img } from './Activities';
 import { withBase } from '@/lib/base';
+import AwardVideo from './AwardVideo';
 
 export default function Home({ products, loading, loadError }) {
   const { t, lang, settings, channels, currency } = useShop();
@@ -54,7 +55,9 @@ export default function Home({ products, loading, loadError }) {
           <img src={img('iya25-banner')} srcSet={`${img('iya25-banner', true)} 960w, ${withBase('/activities/iya25-banner-1200.webp')} 1200w, ${img('iya25-banner')} 1942w`}
             sizes="(max-width: 1200px) 100vw, 1152px" width="1942" height="809" loading="lazy" className="w-full" alt={t('dreamTitle')} />
         </Link>
-        <dl className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="mt-6 grid gap-5 md:grid-cols-[1.35fr_1fr] md:items-center">
+          <AwardVideo caption={t('awardVideo')} />
+          <dl className="grid grid-cols-2 content-start gap-3">
           {[['🏆', 'dreamStat1v', 'dreamStat1'], ['💰', 'dreamStat2v', 'dreamStat2'], ['👥', 'dreamStat3v', 'dreamStat3'], ['📅', 'dreamStat4v', 'dreamStat4']].map(([ic, v, k]) => (
             <div key={k} className="rounded-2xl border border-line bg-white p-4 shadow-sm">
               <dt className="text-xs font-semibold text-ink-faint"><span aria-hidden="true">{ic}</span> {t(k)}</dt>
@@ -62,6 +65,7 @@ export default function Home({ products, loading, loadError }) {
             </div>
           ))}
         </dl>
+        </div>
       </section>
 
       <section id="products" className="reveal mx-auto max-w-6xl scroll-mt-24 px-4 py-6">

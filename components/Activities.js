@@ -5,6 +5,7 @@ import { useShop } from './Providers';
 import { withBase } from '@/lib/base';
 import { STORY, EVENTS, PRODUCT_PHOTOS, CAPTIONS } from '@/lib/activities';
 import { channelHref } from './channels';
+import AwardVideo from './AwardVideo';
 
 const L = (o, lang) => (o ? o[lang] || o.lo || o.en : '');
 export const img = (name, small) => withBase(`/activities/${name}${small ? '-sm' : ''}.webp`);
@@ -85,6 +86,7 @@ function EventBlock({ ev, lang, open, flip }) {
           <img src={img(ev.banner)} alt={L(CAPTIONS[ev.banner], lang)} width="1942" height="809" className="w-full" />
         </button>
       )}
+      {ev.video && <AwardVideo caption={L(ev.video, lang)} className="mx-auto mb-8 max-w-3xl" />}
       <div className={`grid items-start gap-6 md:grid-cols-2 md:gap-10 ${flip ? 'md:[&>*:first-child]:order-2' : ''}`}>
         <Thumb name={ev.cover} lang={lang} onClick={() => open(ev.photos, 0)} className="aspect-[4/3] shadow-lg" priority />
         <div>
