@@ -41,6 +41,29 @@ export default function Home({ products, loading, loadError }) {
         </div>
       </section>
 
+      <section className="reveal mx-auto max-w-6xl px-4 pb-14 pt-2" aria-labelledby="dream-title">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full bg-saffron-pale px-3 py-1 text-xs font-bold uppercase tracking-wider text-saffron-deep">🏆 IYA 2025 · The Best of Business Plan</p>
+            <h2 id="dream-title" className="mt-3 font-display text-3xl font-bold text-ink md:text-4xl">{t('dreamTitle')}</h2>
+            <p className="mt-2 max-w-2xl text-ink-soft">{t('dreamSub')}</p>
+          </div>
+          <Link href="/activities#iya-2025" className="hb-btn hb-btn-ghost">{t('seeActivities')} →</Link>
+        </div>
+        <Link href="/activities#iya-2025" className="feature-banner block" aria-label={t('dreamTitle')}>
+          <img src={img('iya25-banner')} srcSet={`${img('iya25-banner', true)} 960w, ${withBase('/activities/iya25-banner-1200.webp')} 1200w, ${img('iya25-banner')} 1942w`}
+            sizes="(max-width: 1200px) 100vw, 1152px" width="1942" height="809" loading="lazy" className="w-full" alt={t('dreamTitle')} />
+        </Link>
+        <dl className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {[['🏆', 'dreamStat1v', 'dreamStat1'], ['💰', 'dreamStat2v', 'dreamStat2'], ['👥', 'dreamStat3v', 'dreamStat3'], ['📅', 'dreamStat4v', 'dreamStat4']].map(([ic, v, k]) => (
+            <div key={k} className="rounded-2xl border border-line bg-white p-4 shadow-sm">
+              <dt className="text-xs font-semibold text-ink-faint"><span aria-hidden="true">{ic}</span> {t(k)}</dt>
+              <dd className="mt-1 text-lg font-bold text-jade md:text-xl">{t(v)}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       <section id="products" className="reveal mx-auto max-w-6xl scroll-mt-24 px-4 py-6">
         <h2 className="font-display text-3xl font-bold text-ink">{t('ourProducts')}</h2>
         {currency === 'THB' && <p className="mt-1 text-xs text-ink-faint">{t('thbNote')}</p>}

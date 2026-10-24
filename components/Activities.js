@@ -77,9 +77,14 @@ function Thumb({ name, onClick, className = '', lang, priority }) {
 }
 
 function EventBlock({ ev, lang, open, flip }) {
-  const rest = ev.photos.filter((p) => p !== ev.cover);
+  const rest = ev.photos.filter((p) => p !== ev.cover && p !== ev.banner);
   return (
     <article className="scroll-mt-24" id={ev.id}>
+      {ev.banner && (
+        <button type="button" onClick={() => open(ev.photos, 0)} className="feature-banner mb-8 block w-full">
+          <img src={img(ev.banner)} alt={L(CAPTIONS[ev.banner], lang)} width="1942" height="809" className="w-full" />
+        </button>
+      )}
       <div className={`grid items-start gap-6 md:grid-cols-2 md:gap-10 ${flip ? 'md:[&>*:first-child]:order-2' : ''}`}>
         <Thumb name={ev.cover} lang={lang} onClick={() => open(ev.photos, 0)} className="aspect-[4/3] shadow-lg" priority />
         <div>
