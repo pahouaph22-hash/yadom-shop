@@ -34,6 +34,7 @@ export function Header() {
   const name = pickLang(settings.store_name, lang) || 'ຢາດົມຫອມລາວ';
   const links = [
     { href: '/#products', label: t('products') },
+    { href: '/activities', label: t('activitiesNav') },
     { href: '/track', label: t('track') },
     { href: '/contact', label: t('contact') },
   ];

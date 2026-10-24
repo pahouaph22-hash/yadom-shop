@@ -4,6 +4,7 @@ import { useShop } from './Providers';
 import ProductCard, { InhalerArt } from './ProductCard';
 import { pickLang } from '@/lib/format';
 import { ChannelIcon, channelHref, CHANNEL_LABEL } from './channels';
+import { img } from './Activities';
 
 export default function Home({ products, loading, loadError }) {
   const { t, lang, settings, channels, currency } = useShop();
@@ -55,6 +56,24 @@ export default function Home({ products, loading, loadError }) {
             {products.map((p) => <ProductCard key={p.id} p={p} />)}
           </div>
         )}
+      </section>
+
+      <section className="mx-auto mt-16 max-w-6xl px-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="font-display text-3xl font-bold text-ink">{t('ourJourney')}</h2>
+            <p className="mt-1 max-w-xl text-ink-soft">{t('ourJourneySub')}</p>
+          </div>
+          <Link href="/activities" className="btn-ghost">{t('seeActivities')} →</Link>
+        </div>
+        <Link href="/activities" className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-4" aria-label={t('seeActivities')}>
+          {['iya-guest', 'product-blue', 'aromdee-front-2', 'iya-team-girls', 'aromdee-meeting'].map((n, i) => (
+            <span key={n} className={`group relative overflow-hidden rounded-2xl bg-jade-wash ${i === 0 ? 'col-span-2 row-span-2 aspect-square md:aspect-auto' : 'aspect-square'}`}>
+              <img src={img(n, true)} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+              {i === 0 && <span className="absolute left-3 top-3 rounded-full bg-saffron px-3 py-1 text-xs font-bold text-ink">🏆 IYA 2024</span>}
+            </span>
+          ))}
+        </Link>
       </section>
 
       <section className="mx-auto mt-12 max-w-6xl px-4">
