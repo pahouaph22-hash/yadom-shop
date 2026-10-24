@@ -5,7 +5,6 @@ import ProductCard from './ProductCard';
 import { pickLang } from '@/lib/format';
 import { ChannelIcon, channelHref, CHANNEL_LABEL } from './channels';
 import { img } from './Activities';
-import { HeroScrollCue } from './GlassHeader';
 import { withBase } from '@/lib/base';
 
 export default function Home({ products, loading, loadError }) {
@@ -13,23 +12,21 @@ export default function Home({ products, loading, loadError }) {
   const name = pickLang(settings.store_name, lang) || 'ຢາດົມຫອມລາວ';
   return (
     <>
-      <section className="hero hero-banner" aria-label={name}>
-        <div className="hero-bg" aria-hidden="true" style={{ backgroundImage: `url(${withBase('/hero/banner-bg.webp')})` }} />
-        <div className="hb-stage">
-          <h1 className="sr-only">{name} — {pickLang(settings.store_tagline, lang)}</h1>
+      <section className="hb" aria-label={name}>
+        <h1 className="sr-only">{name} — {pickLang(settings.store_tagline, lang)}</h1>
+        <div className="hb-frame">
           <img className="hb-img" src={withBase('/hero/banner-lao.webp')}
             srcSet={`${withBase('/hero/banner-lao-1200.webp')} 1200w, ${withBase('/hero/banner-lao.webp')} 1978w`}
-            sizes="(max-width: 860px) 100vw, 92vw" width="1978" height="795"
+            sizes="100vw" width="1978" height="795" fetchPriority="high"
             alt="ຢາດົມຫອມລາວ — ຫອມສະບາຍ ກິ່ນທຳມະຊາດ ດີຕໍ່ທ່ານ · ຫອມທຳມະຊາດ ຈາກໃຈລາວ" />
-          <div className="hb-row">
-            <p className="hb-chip">🏆 IYA 2025 · THE BEST OF BUSINESS PLAN</p>
-            <div className="flex flex-wrap gap-3">
-              <a href="#products" className="hero-btn bg-white text-ink hover:bg-jade-mist">{t('shopNow')} →</a>
-              <Link href="/activities" className="hero-btn text-white" style={{ background: 'rgba(255,255,255,.14)', backdropFilter: 'blur(10px)' }}>{t('ourJourney')}</Link>
-            </div>
+        </div>
+        <div className="hb-row">
+          <p className="hb-chip"><span aria-hidden="true">🏆</span> IYA 2025 · The Best of Business Plan</p>
+          <div className="hb-btns">
+            <a href="#products" className="hb-btn hb-btn-main">{t('shopNow')} <span aria-hidden="true">→</span></a>
+            <Link href="/activities" className="hb-btn hb-btn-ghost">{t('ourJourney')}</Link>
           </div>
         </div>
-        <HeroScrollCue />
       </section>
       <div className="ikat h-6" aria-hidden="true" />
 

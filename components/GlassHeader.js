@@ -54,7 +54,7 @@ export default function GlassHeader() {
   const { lang, setLang, currency, setCurrency, settings, cart, user, isStaff, t } = useShop();
   const path = usePathname();
   const isHome = path === '/';
-  const [solid, setSolid] = useState(!isHome);
+  const [solid, setSolid] = useState(true);
   const [sheet, setSheet] = useState(false);
   const [dItem, setDItem] = useState(0);
   const count = cart.reduce((s, x) => s + x.qty, 0);
@@ -65,12 +65,7 @@ export default function GlassHeader() {
   const ctl = useRef({ current: null, timer: null });
 
   // transparent over the hero, glass once scrolled (or on inner pages)
-  useEffect(() => {
-    if (!isHome) { setSolid(true); return; }
-    const on = () => setSolid(window.scrollY > 40);
-    on(); window.addEventListener('scroll', on, { passive: true });
-    return () => window.removeEventListener('scroll', on);
-  }, [isHome]);
+  useEffect(() => { setSolid(true); }, [isHome]);
 
   // morphing dropdown (vanilla DOM, mirrors the reference behaviour)
   useEffect(() => {
@@ -224,7 +219,7 @@ export default function GlassHeader() {
           </div>
         </div>
       </header>
-      {!isHome && <div className="h-[76px] no-print" aria-hidden="true" />}
+      <div className="h-[76px] no-print" aria-hidden="true" />
     </>
   );
 }
