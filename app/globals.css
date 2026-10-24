@@ -185,3 +185,23 @@ body { background: #F7FAF8; color: #18231F; }
 /* cue sits low so it doesn't cover faces/banners in the cover photo */
 .scroll-cue { top: auto; bottom: 30px; }
 @media (max-width: 860px) { .scroll-cue { display: none; } }
+
+/* banner cover: whole banner shown as a floating card over its own blurred backdrop */
+.hero-banner .hero-bg { background-size: cover; transform-origin: center; }
+.hero-banner::after { background: linear-gradient(to bottom, rgba(5,14,10,.55) 0%, rgba(5,14,10,.15) 30%, rgba(5,14,10,.25) 70%, rgba(5,14,10,.7) 100%); }
+.hb-stage { position: absolute; inset: 76px 0 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(18px, 3vh, 32px); padding: 0 clamp(16px, 3.4vw, 52px) clamp(56px, 8vh, 90px); }
+.hb-img { width: min(100%, calc((100svh - 260px) * 2.488)); height: auto; border-radius: clamp(12px, 1.6vw, 22px); box-shadow: 0 40px 90px -30px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.18);
+  animation: hbIn 1.6s var(--gh-ease) .15s both; }
+.hb-row { width: min(100%, calc((100svh - 260px) * 2.488)); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+.hb-row > * { animation: ghFadeUp 1s var(--gh-ease) both; } .hb-row > *:nth-child(1) { animation-delay: 1s; } .hb-row > *:nth-child(2) { animation-delay: 1.15s; }
+.hb-chip { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; letter-spacing: .04em; color: rgba(255,255,255,.92); background: rgba(255,255,255,.12); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+@keyframes hbIn { from { opacity: 0; transform: translateY(24px) scale(.96); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+@media (max-width: 860px) {
+  .hero-banner { height: auto; min-height: 0; }
+  .hb-stage { position: relative; inset: auto; padding: 92px 12px 28px; }
+  .hb-img, .hb-row { width: 100%; }
+  .hb-row { flex-direction: column; align-items: stretch; text-align: center; }
+  .hb-row .flex { justify-content: center; }
+  .hb-chip { align-self: center; }
+}
+@media (prefers-reduced-motion: reduce) { .hb-img, .hb-row > * { animation: none !important; } }

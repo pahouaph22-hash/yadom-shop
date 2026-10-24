@@ -13,21 +13,23 @@ export default function Home({ products, loading, loadError }) {
   const name = pickLang(settings.store_name, lang) || 'ຢາດົມຫອມລາວ';
   return (
     <>
-      <section className="hero" aria-label={name}>
-        <div className="hero-bg hidden md:block" role="img" aria-label="ຢາດົມຫອມລາວ" style={{ backgroundImage: `url(${withBase('/hero/hero-desktop.webp')})` }} />
-        <div className="hero-bg md:hidden" role="img" aria-label="ຢາດົມຫອມລາວ" style={{ backgroundImage: `url(${withBase('/hero/hero-mobile.webp')})`, backgroundPosition: 'center 50%' }} />
-        <HeroScrollCue />
-        <div className="hero-copy">
-          <div className="max-w-2xl">
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold tracking-wide text-white/90 backdrop-blur" style={{ background: 'rgba(255,255,255,.12)' }}>🏆 IYA 2025 · THE BEST OF BUSINESS PLAN</p>
-            <h1 className="font-display text-5xl font-bold leading-[1.1] text-white sm:text-6xl md:text-7xl">{name}</h1>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-white/80 md:text-lg">{pickLang(settings.store_tagline, lang)}</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <a href="#products" className="hero-btn bg-white text-ink hover:bg-jade-mist">{t('shopNow')} →</a>
-            <Link href="/activities" className="hero-btn text-white" style={{ background: 'rgba(255,255,255,.14)', backdropFilter: 'blur(10px)' }}>{t('ourJourney')}</Link>
+      <section className="hero hero-banner" aria-label={name}>
+        <div className="hero-bg" aria-hidden="true" style={{ backgroundImage: `url(${withBase('/hero/banner-bg.webp')})` }} />
+        <div className="hb-stage">
+          <h1 className="sr-only">{name} — {pickLang(settings.store_tagline, lang)}</h1>
+          <img className="hb-img" src={withBase('/hero/banner-lao.webp')}
+            srcSet={`${withBase('/hero/banner-lao-1200.webp')} 1200w, ${withBase('/hero/banner-lao.webp')} 1978w`}
+            sizes="(max-width: 860px) 100vw, 92vw" width="1978" height="795"
+            alt="ຢາດົມຫອມລາວ — ຫອມສະບາຍ ກິ່ນທຳມະຊາດ ດີຕໍ່ທ່ານ · ຫອມທຳມະຊາດ ຈາກໃຈລາວ" />
+          <div className="hb-row">
+            <p className="hb-chip">🏆 IYA 2025 · THE BEST OF BUSINESS PLAN</p>
+            <div className="flex flex-wrap gap-3">
+              <a href="#products" className="hero-btn bg-white text-ink hover:bg-jade-mist">{t('shopNow')} →</a>
+              <Link href="/activities" className="hero-btn text-white" style={{ background: 'rgba(255,255,255,.14)', backdropFilter: 'blur(10px)' }}>{t('ourJourney')}</Link>
+            </div>
           </div>
         </div>
+        <HeroScrollCue />
       </section>
       <div className="ikat h-6" aria-hidden="true" />
 
