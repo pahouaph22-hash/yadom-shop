@@ -111,7 +111,7 @@ body { background: #F7FAF8; color: #18231F; }
   transition: opacity .36s ease .06s, transform var(--gh-morph) var(--gh-ease), filter .45s ease .04s, visibility 0s; }
 .gh-panel.snap { transition: none !important; }
 
-.gh-p-discover { width: 664px; height: 358px; display: grid; grid-template-columns: 236px 1fr; }
+.gh-p-discover { width: 664px; height: 430px; display: grid; grid-template-columns: 236px 1fr; }
 .gh-dlist { display: flex; flex-direction: column; padding: 8px; gap: 2px; }
 .gh-ditem { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 12px; border-radius: 10px; transition: background .3s; }
 .gh-ditem.is-active { background: var(--gh-hover); }

@@ -28,6 +28,8 @@ const DISCOVER = [
     d: { lo: 'ຈາກແນວຄິດນັກສຶກສາ ສູ່ແບຣນລາວ.', th: 'จากไอเดียนักศึกษา สู่แบรนด์ลาว', en: 'From a student idea to a Lao brand.' } },
   { href: '/activities#iya-2025', img: 'iya25-award-team', t: { lo: '🏆 IYA 2025', th: '🏆 IYA 2025', en: '🏆 IYA 2025' },
     d: { lo: 'ແຜນທຸລະກິດດີເດັ່ນ ທຶນ 10 ລ້ານກີບ.', th: 'แผนธุรกิจยอดเยี่ยม ทุน 10 ล้านกีบ', en: 'Best Business Plan, 10M Kip prize.' } },
+  { href: '/activities#field-research', img: 'field-herb-stall', t: { lo: 'ລົງພື້ນທີ່ສຳຫຼວດ', th: 'ลงพื้นที่สำรวจ', en: 'Field research' },
+    d: { lo: 'ສຳພາດລູກຄ້າ ແລະ ໝໍຢາພື້ນບ້ານ.', th: 'สัมภาษณ์ลูกค้าและหมอยาพื้นบ้าน', en: 'Customer and healer interviews.' } },
   { href: '/activities#aromdee', img: 'aromdee-front-2', t: { lo: 'ຄູ່ຮ່ວມ ຫຼວງພະບາງ', th: 'พันธมิตร หลวงพระบาง', en: 'Luang Prabang partners' },
     d: { lo: 'ພົບປະຮ້ານ Aromdee ໃນເມືອງມໍລະດົກ.', th: 'พบปะร้าน Aromdee ในเมืองมรดกโลก', en: 'Meeting Aromdee in the heritage town.' } },
 ];
