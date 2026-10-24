@@ -7,8 +7,8 @@ export const metadata = {
   metadataBase: new URL(SITE + '/'),
   title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao',
   description: DESC,
-  openGraph: { type: 'website', siteName: 'Ya Dom Hom Lao', title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao', description: DESC, url: SITE + '/', locale: 'lo_LA' },
-  twitter: { card: 'summary', title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao', description: DESC },
+  openGraph: { type: 'website', siteName: 'Ya Dom Hom Lao', title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao', description: DESC, url: SITE + '/', locale: 'lo_LA', images: [{ url: 'brand/yadom-share-1200x630.jpg', width: 1200, height: 630, alt: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao' }] },
+  twitter: { card: 'summary_large_image', images: ['brand/yadom-share-1200x630.jpg'], title: 'ຢາດົມຫອມລາວ · Ya Dom Hom Lao', description: DESC },
 };
 export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#0F4C3A' };
 

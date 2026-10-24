@@ -1,4 +1,5 @@
 'use client';
+import { withBase } from '@/lib/base';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -54,7 +55,7 @@ export default function AdminShell({ children }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="hidden flex-col bg-jade-deep p-4 lg:flex no-print">
-        <Link href="/admin" className="mb-1 font-display text-xl font-bold text-white">ຢາດົມຫອມລາວ</Link>
+        <Link href="/admin" className="mb-1 flex items-center gap-2 font-display text-xl font-bold text-white"><img src={withBase('/brand/yadom-icon.svg')} alt="" className="h-9 w-9" />ຢາດົມຫອມລາວ</Link>
         <div className="ikat ikat-thin mb-5 rounded" aria-hidden="true" />
         {nav}
         <div className="mt-auto space-y-2 pt-6 text-xs text-jade-mist">

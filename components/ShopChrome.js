@@ -1,4 +1,5 @@
 'use client';
+import { withBase } from '@/lib/base';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useShop } from './Providers';
@@ -41,7 +42,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-white/95 backdrop-blur no-print">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-        <Link href="/" className="font-display text-xl font-bold text-jade">{name}</Link>
+        <Link href="/" className="flex shrink-0 items-center gap-2 font-display text-xl font-bold text-jade">
+          <img src={withBase('/brand/yadom-icon.svg')} alt="" width="36" height="36" className="h-9 w-9" />{name}
+        </Link>
         <nav className="ml-4 hidden gap-5 text-sm font-medium text-ink-soft md:flex">
           {links.map((l) => <Link key={l.href} href={l.href} className="hover:text-jade">{l.label}</Link>)}
         </nav>
@@ -76,9 +79,12 @@ export function Footer() {
       <div className="ikat h-6" aria-hidden="true" />
       <div className="bg-jade-deep text-jade-mist">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
-          <div>
+          <div className="flex items-start gap-4">
+            <img src={withBase('/brand/yadom-logo.svg')} alt="ຢາດົມຫອມລາວ" width="96" height="96" className="h-24 w-24 shrink-0" />
+            <div>
             <p className="font-display text-2xl font-bold text-white">{pickLang(settings.store_name, lang)}</p>
             <p className="mt-2 max-w-xs text-sm opacity-80">{pickLang(settings.store_tagline, lang)}</p>
+            </div>
           </div>
           <div className="md:col-span-2">
             <p className="mb-3 text-sm font-semibold text-saffron">{t('contactUs')}</p>
