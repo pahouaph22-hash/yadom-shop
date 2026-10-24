@@ -26,8 +26,8 @@ const DISCOVER = [
     d: { lo: 'ສະໝຸນໄພລາວແທ້ ກິ່ນຫອມສົດຊື່ນ ໃຊ້ງ່າຍທຸກວັນ.', th: 'สมุนไพรลาวแท้ กลิ่นหอมสดชื่น ใช้ง่ายทุกวัน', en: 'Real Lao herbs, a fresh scent for every day.' } },
   { href: '/activities', img: 'iya-team-girls', t: { lo: 'ເລື່ອງລາວຂອງພວກເຮົາ', th: 'เรื่องราวของเรา', en: 'Our story' },
     d: { lo: 'ຈາກແນວຄິດນັກສຶກສາ ສູ່ແບຣນລາວ.', th: 'จากไอเดียนักศึกษา สู่แบรนด์ลาว', en: 'From a student idea to a Lao brand.' } },
-  { href: '/activities#iya-2024', img: 'iya-guest', t: { lo: 'IYA 2024', th: 'IYA 2024', en: 'IYA 2024' },
-    d: { lo: 'ລາງວັນຊະນະເລີດ ທີ່ ມ.ສຸພານຸວົງ.', th: 'รางวัลชนะเลิศ ที่ ม.สุพานุวง', en: 'First prize at Souphanouvong University.' } },
+  { href: '/activities#iya-2025', img: 'iya25-award-team', t: { lo: '🏆 IYA 2025', th: '🏆 IYA 2025', en: '🏆 IYA 2025' },
+    d: { lo: 'ແຜນທຸລະກິດດີເດັ່ນ ທຶນ 10 ລ້ານກີບ.', th: 'แผนธุรกิจยอดเยี่ยม ทุน 10 ล้านกีบ', en: 'Best Business Plan, 10M Kip prize.' } },
   { href: '/activities#aromdee', img: 'aromdee-front-2', t: { lo: 'ຄູ່ຮ່ວມ ຫຼວງພະບາງ', th: 'พันธมิตร หลวงพระบาง', en: 'Luang Prabang partners' },
     d: { lo: 'ພົບປະຮ້ານ Aromdee ໃນເມືອງມໍລະດົກ.', th: 'พบปะร้าน Aromdee ในเมืองมรดกโลก', en: 'Meeting Aromdee in the heritage town.' } },
 ];

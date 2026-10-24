@@ -90,7 +90,7 @@ function EventBlock({ ev, lang, open, flip }) {
           </div>
           <h3 className="mt-3 font-display text-2xl font-bold leading-snug text-ink md:text-3xl">{L(ev.title, lang)}</h3>
           <p className="mt-3 leading-relaxed text-ink-soft">{L(ev.body, lang)}</p>
-          <div className="mt-5 grid grid-cols-3 gap-2">
+          <div className={`mt-5 grid gap-2 ${rest.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
             {rest.slice(0, rest.length >= 4 ? 6 : 3).map((p, i) => (
               <Thumb key={p} name={p} lang={lang} onClick={() => open(ev.photos, ev.photos.indexOf(p))}
                 className={`aspect-square ${i === 0 && rest.length >= 4 ? 'col-span-2 row-span-2 aspect-auto' : ''}`} />

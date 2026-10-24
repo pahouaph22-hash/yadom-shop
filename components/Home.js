@@ -66,10 +66,10 @@ export default function Home({ products, loading, loadError }) {
           <Link href="/activities" className="btn-ghost">{t('seeActivities')} →</Link>
         </div>
         <Link href="/activities" className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-4" aria-label={t('seeActivities')}>
-          {['iya-guest', 'product-blue', 'aromdee-front-2', 'iya-team-girls', 'aromdee-meeting'].map((n, i) => (
+          {['iya25-award-team', 'product-blue', 'iya25-pitch', 'iya-guest', 'aromdee-front-2'].map((n, i) => (
             <span key={n} className={`group relative overflow-hidden rounded-2xl bg-jade-wash ${i === 0 ? 'col-span-2 row-span-2 aspect-square md:aspect-auto' : 'aspect-square'}`}>
               <img src={img(n, true)} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-              {i === 0 && <span className="absolute left-3 top-3 rounded-full bg-saffron px-3 py-1 text-xs font-bold text-ink">🏆 IYA 2024</span>}
+              {i === 0 && <span className="absolute left-3 top-3 rounded-full bg-saffron px-3 py-1 text-xs font-bold text-ink">🏆 IYA 2025</span>}
             </span>
           ))}
         </Link>
