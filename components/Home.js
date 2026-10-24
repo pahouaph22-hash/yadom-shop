@@ -15,11 +15,11 @@ export default function Home({ products, loading, loadError }) {
     <>
       <section className="hero" aria-label={name}>
         <div className="hero-bg hidden md:block" role="img" aria-label="ຢາດົມຫອມລາວ" style={{ backgroundImage: `url(${withBase('/hero/hero-desktop.webp')})` }} />
-        <div className="hero-bg md:hidden" role="img" aria-label="ຢາດົມຫອມລາວ" style={{ backgroundImage: `url(${withBase('/hero/hero-mobile.webp')})`, backgroundPosition: 'center 40%' }} />
+        <div className="hero-bg md:hidden" role="img" aria-label="ຢາດົມຫອມລາວ" style={{ backgroundImage: `url(${withBase('/hero/hero-mobile.webp')})`, backgroundPosition: 'center 50%' }} />
         <HeroScrollCue />
         <div className="hero-copy">
           <div className="max-w-2xl">
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold tracking-wide text-white/90 backdrop-blur" style={{ background: 'rgba(255,255,255,.12)' }}>🏆 IYA 2024 · LAO HERBAL INHALANT</p>
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold tracking-wide text-white/90 backdrop-blur" style={{ background: 'rgba(255,255,255,.12)' }}>🏆 IYA 2025 · THE BEST OF BUSINESS PLAN</p>
             <h1 className="font-display text-5xl font-bold leading-[1.1] text-white sm:text-6xl md:text-7xl">{name}</h1>
             <p className="mt-4 max-w-md text-base leading-relaxed text-white/80 md:text-lg">{pickLang(settings.store_tagline, lang)}</p>
           </div>

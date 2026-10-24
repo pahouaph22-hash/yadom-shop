@@ -182,3 +182,6 @@ body { background: #F7FAF8; color: #18231F; }
   .gh-panel, .gh-dmedia img { filter: none !important; }
   .js-reveal .reveal { opacity: 1; transform: none; transition: none; }
 }
+/* cue sits low so it doesn't cover faces/banners in the cover photo */
+.scroll-cue { top: auto; bottom: 30px; }
+@media (max-width: 860px) { .scroll-cue { display: none; } }
