@@ -15,9 +15,9 @@ export default function Home({ products, loading, loadError }) {
       <section className="hb" aria-label={name}>
         <h1 className="sr-only">{name} — {pickLang(settings.store_tagline, lang)}</h1>
         <div className="hb-frame">
-          <img className="hb-img" src={withBase('/hero/banner-lao.webp')}
-            srcSet={`${withBase('/hero/banner-lao-1200.webp')} 1200w, ${withBase('/hero/banner-lao.webp')} 1978w`}
-            sizes="100vw" width="1978" height="795" fetchPriority="high"
+          <img className="hb-img" src={withBase('/hero/cover-v2.webp')}
+            srcSet={`${withBase('/hero/cover-v2-1200.webp')} 1200w, ${withBase('/hero/cover-v2.webp')} 1912w`}
+            sizes="100vw" width="1912" height="823" fetchPriority="high"
             alt="ຢາດົມຫອມລາວ — ຫອມສະບາຍ ກິ່ນທຳມະຊາດ ດີຕໍ່ທ່ານ · ຫອມທຳມະຊາດ ຈາກໃຈລາວ" />
         </div>
         <div className="hb-row">
